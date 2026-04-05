@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dispatch Montreal - Coordinator Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: #16324f;
+            color: white;
+            padding: 24px 18px;
+        }
+
+        .sidebar h2 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .sidebar p {
+            font-size: 14px;
+            color: #c8d6e5;
+            margin-bottom: 28px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            padding: 12px 10px;
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .sidebar ul li.active {
+            background: #2f6fa5;
+        }
+
+        .main {
+            flex: 1;
+            padding: 24px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .topbar h1 {
+            font-size: 28px;
+        }
+
+        .topbar .coordinator {
+            background: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .alert-box {
+            background: #ffe9e9;
+            border-left: 6px solid #d63031;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-box h3 {
+            margin-bottom: 8px;
+            color: #b71c1c;
+        }
+
+        .alert-box p {
+            margin-bottom: 14px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-red {
+            background: #d63031;
+            color: white;
+        }
+
+        .btn-blue {
+            background: #0984e3;
+            color: white;
+        }
+
+        .btn-green {
+            background: #00b894;
+            color: white;
+        }
+
+        .btn-gray {
+            background: #636e72;
+            color: white;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .card h3 {
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+
+        .card p {
+            margin-bottom: 7px;
+            font-size: 14px;
+        }
+
+        .priority {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .high {
+            background: #ffcccc;
+            color: #b71c1c;
+        }
+
+        .medium {
+            background: #fff3cd;
+            color: #8a6d3b;
+        }
+
+        .low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status {
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .resident-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .table-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .table-section h2 {
+            margin-bottom: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        table th {
+            background: #f0f4f8;
+        }
+
+        .small-tag {
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .waiting {
+            background: #fff3cd;
+            color: #8a6d3b;
+        }
+
+        .assigned {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .safe {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            color: #666;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <aside class="sidebar">
+        <h2>Dispatch Montreal</h2>
+        <p>Coordinator Dashboard</p>
+        <ul>
+            <li class="active">Dashboard</li>
+            <li>Emergency Events</li>
+            <li>Residents</li>
+            <li>Volunteers</li>
+            <li>Reports</li>
+        </ul>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <h1>Coordinator Dashboard</h1>
+            <div class="coordinator">Logged in: Community Hub Coordinator</div>
+        </div>
+
+        <div class="alert-box">
+            <h3>Active Emergency</h3>
+            <p id="eventText">No emergency triggered yet. Click a button below to simulate a front-end event for the mock-up demo.</p>
+            <div class="btn-group">
+                <button class="btn-red" onclick="triggerEvent('Winter Power Outage in Verdun')">Trigger Power Outage</button>
+                <button class="btn-blue" onclick="triggerEvent('Extreme Cold Alert in NDG')">Trigger Weather Alert</button>
+                <button class="btn-gray" onclick="resetDashboard()">Reset Demo</button>
+            </div>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <h3>Marguerite, 78</h3>
+                <span class="priority high">High Priority</span>
+                <p><strong>Area:</strong> Verdun</p>
+                <p><strong>Condition:</strong> Limited mobility, diabetes</p>
+                <p><strong>Address:</strong> 214 Rue Wellington</p>
+                <p class="status">Status: <span id="status1">Waiting</span></p>
+                <div class="resident-actions">
+                    <button class="btn-blue" onclick="assignVolunteer('Marguerite, 78', 'status1', 'row1')">Assign Volunteer</button>
+                    <button class="btn-red" onclick="escalateCase('Marguerite, 78', 'status1', 'row1')">Escalate</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Jean, 69</h3>
+                <span class="priority medium">Medium Priority</span>
+                <p><strong>Area:</strong> NDG</p>
+                <p><strong>Condition:</strong> Lives alone</p>
+                <p><strong>Address:</strong> 88 Avenue Somerled</p>
+                <p class="status">Status: <span id="status2">Waiting</span></p>
+                <div class="resident-actions">
+                    <button class="btn-blue" onclick="assignVolunteer('Jean, 69', 'status2', 'row2')">Assign Volunteer</button>
+                    <button class="btn-red" onclick="escalateCase('Jean, 69', 'status2', 'row2')">Escalate</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Amina, 74</h3>
+                <span class="priority low">Low Priority</span>
+                <p><strong>Area:</strong> Rosemont</p>
+                <p><strong>Condition:</strong> Needs check-in only</p>
+                <p><strong>Address:</strong> 5030 Rue Beaubien</p>
+                <p class="status">Status: <span id="status3">Waiting</span></p>
+                <div class="resident-actions">
+                    <button class="btn-blue" onclick="assignVolunteer('Amina, 74', 'status3', 'row3')">Assign Volunteer</button>
+                    <button class="btn-red" onclick="escalateCase('Amina, 74', 'status3', 'row3')">Escalate</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-section">
+            <h2>Assignment Activity</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Resident</th>
+                    <th>Volunteer</th>
+                    <th>Area</th>
+                    <th>Current State</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr id="row1">
+                    <td>Marguerite, 78</td>
+                    <td>Not Assigned</td>
+                    <td>Verdun</td>
+                    <td><span class="small-tag waiting">Waiting</span></td>
+                </tr>
+                <tr id="row2">
+                    <td>Jean, 69</td>
+                    <td>Not Assigned</td>
+                    <td>NDG</td>
+                    <td><span class="small-tag waiting">Waiting</span></td>
+                </tr>
+                <tr id="row3">
+                    <td>Amina, 74</td>
+                    <td>Not Assigned</td>
+                    <td>Rosemont</td>
+                    <td><span class="small-tag waiting">Waiting</span></td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="footer-note">
+                Front-end mock-up only. No real database, API, map, or SMS is connected.
+            </p>
+        </div>
+    </main>
+</div>
+
+<script>
+    function triggerEvent(message) {
+        document.getElementById("eventText").innerText =
+            "Emergency triggered: " + message + ". The dashboard now shows affected residents and allows the coordinator to assign volunteers.";
+    }
+
+    function assignVolunteer(residentName, statusId, rowId) {
+        document.getElementById(statusId).innerText = "Volunteer Assigned";
+
+        const row = document.getElementById(rowId);
+        row.cells[1].innerText = "David (Volunteer)";
+        row.cells[3].innerHTML = '<span class="small-tag assigned">Assigned</span>';
+
+        alert("Volunteer assigned to " + residentName);
+    }
+
+    function escalateCase(residentName, statusId, rowId) {
+        document.getElementById(statusId).innerText = "Escalated to Emergency Services";
+
+        const row = document.getElementById(rowId);
+        row.cells[1].innerText = "Coordinator Action";
+        row.cells[3].innerHTML = '<span class="small-tag danger">Escalated</span>';
+
+        alert(residentName + " has been escalated to emergency services.");
+    }
+
+    function resetDashboard() {
+        document.getElementById("eventText").innerText =
+            "No emergency triggered yet. Click a button below to simulate a front-end event for the mock-up demo.";
+
+        document.getElementById("status1").innerText = "Waiting";
+        document.getElementById("status2").innerText = "Waiting";
+        document.getElementById("status3").innerText = "Waiting";
+
+        document.getElementById("row1").cells[1].innerText = "Not Assigned";
+        document.getElementById("row1").cells[3].innerHTML = '<span class="small-tag waiting">Waiting</span>';
+
+        document.getElementById("row2").cells[1].innerText = "Not Assigned";
+        document.getElementById("row2").cells[3].innerHTML = '<span class="small-tag waiting">Waiting</span>';
+
+        document.getElementById("row3").cells[1].innerText = "Not Assigned";
+        document.getElementById("row3").cells[3].innerHTML = '<span class="small-tag waiting">Waiting</span>';
+    }
+</script>
+</body>
+</html>
