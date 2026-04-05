@@ -4,7 +4,34 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dispatch Montreal - Coordinator Dashboard</title>
+    <!-- Add this inside <head>, above your <style> -->
+    <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
     <style>
+        :root {
+            --bg: #eef2f6;
+            --surface: #ffffff;
+            --surface-muted: #f7f9fc;
+            --sidebar: #1f3347;
+            --sidebar-hover: #2b4863;
+            --primary: #2f5d7c;
+            --primary-dark: #23445b;
+            --danger: #b94a48;
+            --danger-soft: #f6e2e1;
+            --warning: #b38728;
+            --warning-soft: #f8eed3;
+            --success: #3f7d5c;
+            --success-soft: #dceee3;
+            --text: #1f2933;
+            --text-soft: #617182;
+            --border: #d7dee7;
+            --shadow: 0 8px 24px rgba(31, 41, 51, 0.08);
+            --radius: 14px;
+            --transition: 0.2s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,247 +40,430 @@
         }
 
         body {
-            background: #f4f6f9;
-            color: #222;
+            background: var(--bg);
+            color: var(--text);
         }
 
-        .container {
+        .layout {
             display: flex;
             min-height: 100vh;
         }
 
         .sidebar {
-            width: 240px;
-            background: #16324f;
-            color: white;
-            padding: 24px 18px;
+            width: 250px;
+            background: var(--sidebar);
+            color: #fff;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .sidebar h2 {
+        .brand h1 {
             font-size: 22px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
-        .sidebar p {
+        .brand p {
+            color: #d3dde7;
             font-size: 14px;
-            color: #c8d6e5;
-            margin-bottom: 28px;
         }
 
-        .sidebar ul {
+        .nav {
             list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .sidebar ul li {
-            padding: 12px 10px;
-            margin-bottom: 10px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 8px;
+        .nav li {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 14px 12px;
+            border-radius: 10px;
             cursor: pointer;
+            transition: var(--transition);
         }
 
-        .sidebar ul li.active {
-            background: #2f6fa5;
+        .nav li:hover,
+        .nav li.active {
+            background: var(--sidebar-hover);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 14px 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            font-size: 13px;
+            color: #d3dde7;
+            line-height: 1.5;
         }
 
         .main {
             flex: 1;
-            padding: 24px;
+            padding: 28px;
         }
 
         .topbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 16px;
             margin-bottom: 22px;
         }
 
-        .topbar h1 {
-            font-size: 28px;
+        .topbar-left h2 {
+            font-size: 38px;
+            margin-bottom: 6px;
         }
 
-        .topbar .coordinator {
-            background: white;
-            padding: 10px 16px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
+        .topbar-left p {
+            color: var(--text-soft);
+            font-size: 15px;
         }
 
-        .alert-box {
-            background: #ffe9e9;
-            border-left: 6px solid #d63031;
+        .topbar-right {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            box-shadow: var(--shadow);
+            font-size: 14px;
+            color: var(--text-soft);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .summary-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             padding: 18px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            box-shadow: var(--shadow);
         }
 
-        .alert-box h3 {
+        .summary-card .label {
+            color: var(--text-soft);
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .value {
+            font-size: 30px;
+            font-weight: bold;
             margin-bottom: 8px;
-            color: #b71c1c;
         }
 
-        .alert-box p {
+        .summary-card .sub {
+            color: var(--text-soft);
+            font-size: 13px;
+        }
+
+        .alert-panel {
+            background: var(--danger-soft);
+            border: 1px solid #e7c3c2;
+            border-left: 6px solid var(--danger);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .alert-panel h3 {
+            color: var(--danger);
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .alert-panel p {
+            margin-bottom: 14px;
+            line-height: 1.5;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #73808c;
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: var(--primary-dark);
+            border: 1px solid var(--border);
+        }
+
+        .middle-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .panel h3 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .panel-subtitle {
+            color: var(--text-soft);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .map-box {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            min-height: 320px;
+            background: #dfe8f1;
+        }
+
+        #dashboardMap {
+            width: 100%;
+            height: 320px;
+        }
+
+        .volunteer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .volunteer-card {
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .volunteer-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .volunteer-top h4 {
+            font-size: 16px;
+        }
+
+        .volunteer-meta {
+            color: var(--text-soft);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .tag-available {
+            background: var(--success-soft);
+            color: var(--success);
+        }
+
+        .tag-busy {
+            background: var(--warning-soft);
+            color: var(--warning);
+        }
+
+        .tag-high {
+            background: var(--danger-soft);
+            color: var(--danger);
+        }
+
+        .tag-medium {
+            background: var(--warning-soft);
+            color: var(--warning);
+        }
+
+        .tag-low {
+            background: var(--success-soft);
+            color: var(--success);
+        }
+
+        .residents-section {
+            margin-bottom: 22px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            color: var(--text-soft);
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .resident-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .resident-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .resident-card h4 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .resident-details {
+            font-size: 15px;
+            line-height: 1.8;
+            margin-top: 12px;
             margin-bottom: 14px;
         }
 
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .btn-red {
-            background: #d63031;
-            color: white;
-        }
-
-        .btn-blue {
-            background: #0984e3;
-            color: white;
-        }
-
-        .btn-green {
-            background: #00b894;
-            color: white;
-        }
-
-        .btn-gray {
-            background: #636e72;
-            color: white;
-        }
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 18px;
-            margin-bottom: 24px;
-        }
-
-        .card {
-            background: white;
-            padding: 18px;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-        }
-
-        .card h3 {
-            margin-bottom: 8px;
-            font-size: 20px;
-        }
-
-        .card p {
-            margin-bottom: 7px;
-            font-size: 14px;
-        }
-
-        .priority {
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 12px;
-        }
-
-        .high {
-            background: #ffcccc;
-            color: #b71c1c;
-        }
-
-        .medium {
-            background: #fff3cd;
-            color: #8a6d3b;
-        }
-
-        .low {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status {
-            font-weight: bold;
-            margin-bottom: 12px;
+        .resident-details strong {
+            color: var(--text);
         }
 
         .resident-actions {
             display: flex;
-            gap: 8px;
             flex-wrap: wrap;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 8px;
         }
 
-        .table-section {
-            background: white;
+        .activity-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            box-shadow: var(--shadow);
         }
 
-        .table-section h2 {
+        .activity-section h3 {
+            font-size: 30px;
             margin-bottom: 14px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 12px;
         }
 
-        table th,
-        table td {
+        th,
+        td {
             text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid #eee;
+            padding: 14px 12px;
+            border-bottom: 1px solid #e7edf3;
             font-size: 14px;
         }
 
-        table th {
-            background: #f0f4f8;
-        }
-
-        .small-tag {
-            padding: 5px 8px;
-            border-radius: 6px;
-            font-size: 12px;
+        th {
+            background: #edf3f8;
+            color: #34495c;
             font-weight: bold;
-            display: inline-block;
         }
 
-        .waiting {
-            background: #fff3cd;
-            color: #8a6d3b;
-        }
-
-        .assigned {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .safe {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .danger {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .footer-note {
-            margin-top: 18px;
-            color: #666;
+        .foot-note {
+            color: var(--text-soft);
             font-size: 13px;
+            margin-top: 14px;
         }
 
-        @media (max-width: 768px) {
-            .container {
+        .assign-box {
+            background: #f8fbfd;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 14px;
+            display: none;
+        }
+
+        .assign-box label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-soft);
+        }
+
+        .assign-box select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: #fff;
+        }
+
+        .assign-box .assign-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 1200px) {
+            .summary-grid,
+            .resident-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .middle-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .layout {
                 flex-direction: column;
             }
 
@@ -261,87 +471,262 @@
                 width: 100%;
             }
 
+            .summary-grid,
+            .resident-grid {
+                grid-template-columns: 1fr;
+            }
+
             .topbar {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 12px;
+            }
+
+            .zone {
+                position: static;
+                margin-bottom: 10px;
+            }
+
+            .route-line {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
-<div class="container">
+<div class="layout">
     <aside class="sidebar">
-        <h2>Dispatch Montreal</h2>
-        <p>Coordinator Dashboard</p>
-        <ul>
+        <div class="brand">
+            <h1>Dispatch Montreal</h1>
+            <p>Coordinator Command Dashboard</p>
+        </div>
+
+        <ul class="nav">
             <li class="active">Dashboard</li>
             <li>Emergency Events</li>
             <li>Residents</li>
             <li>Volunteers</li>
+            <li>Assignments</li>
             <li>Reports</li>
         </ul>
+
+        <div class="sidebar-footer">
+            Front-end prototype only.<br>
+            No real map, API, database, SMS, or GPS is connected.
+        </div>
     </aside>
 
     <main class="main">
-        <div class="topbar">
-            <h1>Coordinator Dashboard</h1>
-            <div class="coordinator">Logged in: Community Hub Coordinator</div>
-        </div>
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2>Coordinator Dashboard</h2>
+                <p>Emergency coordination view for affected residents, nearby volunteers, and assignment tracking.</p>
+            </div>
+            <div class="topbar-right">
+                Logged in: Community Hub Coordinator
+            </div>
+        </header>
 
-        <div class="alert-box">
+        <section class="summary-grid">
+            <div class="summary-card">
+                <div class="label">Active Emergency</div>
+                <div class="value" id="summaryEmergency">0</div>
+                <div class="sub">No emergency triggered yet</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Affected Residents</div>
+                <div class="value">3</div>
+                <div class="sub">Residents currently shown in impact zone</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Available Volunteers</div>
+                <div class="value">3</div>
+                <div class="sub">1 volunteer currently busy</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Escalated Cases</div>
+                <div class="value" id="summaryEscalated">0</div>
+                <div class="sub">Cases sent for emergency action</div>
+            </div>
+        </section>
+
+        <section class="alert-panel">
             <h3>Active Emergency</h3>
             <p id="eventText">No emergency triggered yet. Click a button below to simulate a front-end event for the mock-up demo.</p>
-            <div class="btn-group">
-                <button class="btn-red" onclick="triggerEvent('Winter Power Outage in Verdun')">Trigger Power Outage</button>
-                <button class="btn-blue" onclick="triggerEvent('Extreme Cold Alert in NDG')">Trigger Weather Alert</button>
-                <button class="btn-gray" onclick="resetDashboard()">Reset Demo</button>
+            <div class="button-row">
+                <button class="btn btn-danger" onclick="triggerEvent('Winter Power Outage in Verdun')">Trigger Power Outage</button>
+                <button class="btn btn-primary" onclick="triggerEvent('Extreme Cold Alert in NDG')">Trigger Weather Alert</button>
+                <button class="btn btn-secondary" onclick="resetDashboard()">Reset Demo</button>
             </div>
-        </div>
+        </section>
 
-        <div class="cards">
-            <div class="card">
-                <h3>Marguerite, 78</h3>
-                <span class="priority high">High Priority</span>
-                <p><strong>Area:</strong> Verdun</p>
-                <p><strong>Condition:</strong> Limited mobility, diabetes</p>
-                <p><strong>Address:</strong> 214 Rue Wellington</p>
-                <p class="status">Status: <span id="status1">Waiting</span></p>
-                <div class="resident-actions">
-                    <button class="btn-blue" onclick="assignVolunteer('Marguerite, 78', 'status1', 'row1')">Assign Volunteer</button>
-                    <button class="btn-red" onclick="escalateCase('Marguerite, 78', 'status1', 'row1')">Escalate</button>
+        <section class="middle-grid">
+            <div class="panel">
+                <h3>Affected Area Overview</h3>
+                <p class="panel-subtitle">Simple mock-up zone view for the coordinator. This can later be replaced by a real map if needed.</p>
+
+                <div class="map-box">
+                    <div id="dashboardMap"></div>
                 </div>
             </div>
 
-            <div class="card">
-                <h3>Jean, 69</h3>
-                <span class="priority medium">Medium Priority</span>
-                <p><strong>Area:</strong> NDG</p>
-                <p><strong>Condition:</strong> Lives alone</p>
-                <p><strong>Address:</strong> 88 Avenue Somerled</p>
-                <p class="status">Status: <span id="status2">Waiting</span></p>
-                <div class="resident-actions">
-                    <button class="btn-blue" onclick="assignVolunteer('Jean, 69', 'status2', 'row2')">Assign Volunteer</button>
-                    <button class="btn-red" onclick="escalateCase('Jean, 69', 'status2', 'row2')">Escalate</button>
+            <div class="panel">
+                <h3>Available Volunteers</h3>
+                <p class="panel-subtitle">Nearby volunteers the coordinator can assign during the emergency.</p>
+
+                <div class="volunteer-list">
+                    <div class="volunteer-card">
+                        <div class="volunteer-top">
+                            <h4>David R.</h4>
+                            <span class="tag tag-available">Available</span>
+                        </div>
+                        <div class="volunteer-meta">
+                            Area: Verdun<br>
+                            Distance: 0.8 km<br>
+                            Skills: First Aid, Welfare Checks
+                        </div>
+                    </div>
+
+                    <div class="volunteer-card">
+                        <div class="volunteer-top">
+                            <h4>Sarah M.</h4>
+                            <span class="tag tag-available">Available</span>
+                        </div>
+                        <div class="volunteer-meta">
+                            Area: NDG<br>
+                            Distance: 1.4 km<br>
+                            Skills: Senior Support, Phone Check-ins
+                        </div>
+                    </div>
+
+                    <div class="volunteer-card">
+                        <div class="volunteer-top">
+                            <h4>Omar H.</h4>
+                            <span class="tag tag-available">Available</span>
+                        </div>
+                        <div class="volunteer-meta">
+                            Area: Rosemont<br>
+                            Distance: 2.1 km<br>
+                            Skills: Home Visit, Mobility Support
+                        </div>
+                    </div>
+
+                    <div class="volunteer-card">
+                        <div class="volunteer-top">
+                            <h4>Julie T.</h4>
+                            <span class="tag tag-busy">Busy</span>
+                        </div>
+                        <div class="volunteer-meta">
+                            Area: Plateau<br>
+                            Distance: 3.2 km<br>
+                            Status: Already assigned elsewhere
+                        </div>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <div class="card">
-                <h3>Amina, 74</h3>
-                <span class="priority low">Low Priority</span>
-                <p><strong>Area:</strong> Rosemont</p>
-                <p><strong>Condition:</strong> Needs check-in only</p>
-                <p><strong>Address:</strong> 5030 Rue Beaubien</p>
-                <p class="status">Status: <span id="status3">Waiting</span></p>
-                <div class="resident-actions">
-                    <button class="btn-blue" onclick="assignVolunteer('Amina, 74', 'status3', 'row3')">Assign Volunteer</button>
-                    <button class="btn-red" onclick="escalateCase('Amina, 74', 'status3', 'row3')">Escalate</button>
+        <section class="residents-section">
+            <h3 class="section-title">Prioritized Resident List</h3>
+            <p class="section-subtitle">The coordinator reviews affected residents, checks their urgency level, and assigns the most suitable volunteer.</p>
+
+            <div class="resident-grid">
+                <div class="resident-card">
+                    <h4>Marguerite, 78</h4>
+                    <span class="tag tag-high">High Priority</span>
+
+                    <div class="resident-details">
+                        <strong>Area:</strong> Verdun<br>
+                        <strong>Condition:</strong> Limited mobility, diabetes<br>
+                        <strong>Address:</strong> 214 Rue Wellington<br>
+                        <strong>Status:</strong> <span id="status1">Waiting</span>
+                    </div>
+
+                    <div class="resident-actions">
+                        <button class="btn btn-primary" onclick="toggleAssignBox('assignBox1')">Assign Volunteer</button>
+                        <button class="btn btn-danger" onclick="escalateCase('Marguerite, 78', 'status1', 'row1')">Escalate</button>
+                    </div>
+
+                    <div class="assign-box" id="assignBox1">
+                        <label>Select a volunteer for Marguerite</label>
+                        <select id="volunteerSelect1">
+                            <option value="">Choose volunteer</option>
+                            <option value="David R. - 0.8 km away">David R. - 0.8 km away</option>
+                            <option value="Sarah M. - 1.4 km away">Sarah M. - 1.4 km away</option>
+                            <option value="Omar H. - 2.1 km away">Omar H. - 2.1 km away</option>
+                        </select>
+                        <div class="assign-actions">
+                            <button class="btn btn-primary" onclick="confirmAssignment('Marguerite, 78', 'status1', 'row1', 'volunteerSelect1', 'assignBox1')">Confirm Assignment</button>
+                            <button class="btn btn-outline" onclick="toggleAssignBox('assignBox1')">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resident-card">
+                    <h4>Jean, 69</h4>
+                    <span class="tag tag-medium">Medium Priority</span>
+
+                    <div class="resident-details">
+                        <strong>Area:</strong> NDG<br>
+                        <strong>Condition:</strong> Lives alone<br>
+                        <strong>Address:</strong> 88 Avenue Somerled<br>
+                        <strong>Status:</strong> <span id="status2">Waiting</span>
+                    </div>
+
+                    <div class="resident-actions">
+                        <button class="btn btn-primary" onclick="toggleAssignBox('assignBox2')">Assign Volunteer</button>
+                        <button class="btn btn-danger" onclick="escalateCase('Jean, 69', 'status2', 'row2')">Escalate</button>
+                    </div>
+
+                    <div class="assign-box" id="assignBox2">
+                        <label>Select a volunteer for Jean</label>
+                        <select id="volunteerSelect2">
+                            <option value="">Choose volunteer</option>
+                            <option value="Sarah M. - 1.4 km away">Sarah M. - 1.4 km away</option>
+                            <option value="David R. - 2.0 km away">David R. - 2.0 km away</option>
+                            <option value="Omar H. - 2.6 km away">Omar H. - 2.6 km away</option>
+                        </select>
+                        <div class="assign-actions">
+                            <button class="btn btn-primary" onclick="confirmAssignment('Jean, 69', 'status2', 'row2', 'volunteerSelect2', 'assignBox2')">Confirm Assignment</button>
+                            <button class="btn btn-outline" onclick="toggleAssignBox('assignBox2')">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resident-card">
+                    <h4>Amina, 74</h4>
+                    <span class="tag tag-low">Low Priority</span>
+
+                    <div class="resident-details">
+                        <strong>Area:</strong> Rosemont<br>
+                        <strong>Condition:</strong> Needs check-in only<br>
+                        <strong>Address:</strong> 5030 Rue Beaubien<br>
+                        <strong>Status:</strong> <span id="status3">Waiting</span>
+                    </div>
+
+                    <div class="resident-actions">
+                        <button class="btn btn-primary" onclick="toggleAssignBox('assignBox3')">Assign Volunteer</button>
+                        <button class="btn btn-danger" onclick="escalateCase('Amina, 74', 'status3', 'row3')">Escalate</button>
+                    </div>
+
+                    <div class="assign-box" id="assignBox3">
+                        <label>Select a volunteer for Amina</label>
+                        <select id="volunteerSelect3">
+                            <option value="">Choose volunteer</option>
+                            <option value="Omar H. - 2.1 km away">Omar H. - 2.1 km away</option>
+                            <option value="Sarah M. - 2.8 km away">Sarah M. - 2.8 km away</option>
+                            <option value="David R. - 3.0 km away">David R. - 3.0 km away</option>
+                        </select>
+                        <div class="assign-actions">
+                            <button class="btn btn-primary" onclick="confirmAssignment('Amina, 74', 'status3', 'row3', 'volunteerSelect3', 'assignBox3')">Confirm Assignment</button>
+                            <button class="btn btn-outline" onclick="toggleAssignBox('assignBox3')">Cancel</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="table-section">
-            <h2>Assignment Activity</h2>
+        <section class="activity-section">
+            <h3>Assignment Activity</h3>
             <table>
                 <thead>
                 <tr>
@@ -356,43 +741,82 @@
                     <td>Marguerite, 78</td>
                     <td>Not Assigned</td>
                     <td>Verdun</td>
-                    <td><span class="small-tag waiting">Waiting</span></td>
+                    <td><span class="tag tag-medium">Waiting</span></td>
                 </tr>
                 <tr id="row2">
                     <td>Jean, 69</td>
                     <td>Not Assigned</td>
                     <td>NDG</td>
-                    <td><span class="small-tag waiting">Waiting</span></td>
+                    <td><span class="tag tag-medium">Waiting</span></td>
                 </tr>
                 <tr id="row3">
                     <td>Amina, 74</td>
                     <td>Not Assigned</td>
                     <td>Rosemont</td>
-                    <td><span class="small-tag waiting">Waiting</span></td>
+                    <td><span class="tag tag-medium">Waiting</span></td>
                 </tr>
                 </tbody>
             </table>
-            <p class="footer-note">
-                Front-end mock-up only. No real database, API, map, or SMS is connected.
+
+            <p class="foot-note">
+                This front-end prototype is focused on coordinator actions such as viewing affected areas, checking resident priority, seeing available volunteers, assigning a responder, and escalating urgent cases.
             </p>
-        </div>
+        </section>
     </main>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
+    let dashboardMap;
+    let mapInitialized = false;
+
+    function initializeMap() {
+        if (mapInitialized) return;
+
+        dashboardMap = L.map("dashboardMap").setView([45.5017, -73.5673], 11);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(dashboardMap);
+
+        L.marker([45.4592, -73.5725]).addTo(dashboardMap)
+            .bindPopup("<strong>Verdun</strong><br>1 high-priority case");
+
+        L.marker([45.4765, -73.6500]).addTo(dashboardMap)
+            .bindPopup("<strong>NDG</strong><br>1 medium-priority case");
+
+        L.marker([45.5570, -73.5830]).addTo(dashboardMap)
+            .bindPopup("<strong>Rosemont</strong><br>1 low-priority case");
+
+        mapInitialized = true;
+    }
     function triggerEvent(message) {
         document.getElementById("eventText").innerText =
-            "Emergency triggered: " + message + ". The dashboard now shows affected residents and allows the coordinator to assign volunteers.";
+            "Emergency triggered: " + message + ". The coordinator can now review affected residents, check nearby volunteers, and assign support based on urgency.";
+        document.getElementById("summaryEmergency").innerText = "1";
     }
 
-    function assignVolunteer(residentName, statusId, rowId) {
-        document.getElementById(statusId).innerText = "Volunteer Assigned";
+    function toggleAssignBox(boxId) {
+        const box = document.getElementById(boxId);
+        box.style.display = box.style.display === "block" ? "none" : "block";
+    }
 
+    function confirmAssignment(residentName, statusId, rowId, selectId, boxId) {
+        const selectedVolunteer = document.getElementById(selectId).value;
+
+        if (!selectedVolunteer) {
+            alert("Please select a volunteer first.");
+            return;
+        }
+
+        document.getElementById(statusId).innerText = "Assigned";
         const row = document.getElementById(rowId);
-        row.cells[1].innerText = "David (Volunteer)";
-        row.cells[3].innerHTML = '<span class="small-tag assigned">Assigned</span>';
+        row.cells[1].innerText = selectedVolunteer;
+        row.cells[3].innerHTML = '<span class="tag tag-low">Assigned</span>';
 
-        alert("Volunteer assigned to " + residentName);
+        document.getElementById(boxId).style.display = "none";
+        alert(selectedVolunteer + " assigned to " + residentName);
     }
 
     function escalateCase(residentName, statusId, rowId) {
@@ -400,7 +824,10 @@
 
         const row = document.getElementById(rowId);
         row.cells[1].innerText = "Coordinator Action";
-        row.cells[3].innerHTML = '<span class="small-tag danger">Escalated</span>';
+        row.cells[3].innerHTML = '<span class="tag tag-high">Escalated</span>';
+
+        let escalatedCount = parseInt(document.getElementById("summaryEscalated").innerText, 10);
+        document.getElementById("summaryEscalated").innerText = escalatedCount + 1;
 
         alert(residentName + " has been escalated to emergency services.");
     }
@@ -408,20 +835,33 @@
     function resetDashboard() {
         document.getElementById("eventText").innerText =
             "No emergency triggered yet. Click a button below to simulate a front-end event for the mock-up demo.";
+        document.getElementById("summaryEmergency").innerText = "0";
+        document.getElementById("summaryEscalated").innerText = "0";
 
         document.getElementById("status1").innerText = "Waiting";
         document.getElementById("status2").innerText = "Waiting";
         document.getElementById("status3").innerText = "Waiting";
 
         document.getElementById("row1").cells[1].innerText = "Not Assigned";
-        document.getElementById("row1").cells[3].innerHTML = '<span class="small-tag waiting">Waiting</span>';
+        document.getElementById("row1").cells[3].innerHTML = '<span class="tag tag-medium">Waiting</span>';
 
         document.getElementById("row2").cells[1].innerText = "Not Assigned";
-        document.getElementById("row2").cells[3].innerHTML = '<span class="small-tag waiting">Waiting</span>';
+        document.getElementById("row2").cells[3].innerHTML = '<span class="tag tag-medium">Waiting</span>';
 
         document.getElementById("row3").cells[1].innerText = "Not Assigned";
-        document.getElementById("row3").cells[3].innerHTML = '<span class="small-tag waiting">Waiting</span>';
+        document.getElementById("row3").cells[3].innerHTML = '<span class="tag tag-medium">Waiting</span>';
+
+        document.getElementById("assignBox1").style.display = "none";
+        document.getElementById("assignBox2").style.display = "none";
+        document.getElementById("assignBox3").style.display = "none";
+
+        document.getElementById("volunteerSelect1").selectedIndex = 0;
+        document.getElementById("volunteerSelect2").selectedIndex = 0;
+        document.getElementById("volunteerSelect3").selectedIndex = 0;
     }
+    window.addEventListener("load", () => {
+        initializeMap();
+    });
 </script>
 </body>
 </html>
