@@ -32,3 +32,22 @@ The project aims to deliver a functional MVP, validate the platform through a li
 ## Current Status
 
 The project is currently in the planning and design phase. The problem, scope, stakeholders, user needs, and risk considerations have been identified, and the next step is to continue refining the system design and implementation plan.
+# Dispatch Montreal Prototype
+
+This repository contains the front-end prototype for our SOEN 6841 project.
+
+## Interfaces
+- coordinator-dashboard
+- registration-page
+- volunteer-page
+
+## Branch Strategy
+- main: stable version of the prototype
+- feature/coordinator-dashboard: coordinator interface
+- feature/registration-page: resident registration interface
+- feature/volunteer-page: volunteer interface
+
+## Configuration Management
+We used GitHub for version control and configuration management.
+Each team member worked on a separate feature branch.
+Completed work was merged into the stable main branch.
