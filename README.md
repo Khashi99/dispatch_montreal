@@ -51,3 +51,10 @@ This repository contains the front-end prototype for our SOEN 6841 project.
 We used GitHub for version control and configuration management.
 Each team member worked on a separate feature branch.
 Completed work was merged into the stable main branch.
+
+## Run the app 
+python3 -m http.server 5500
+http://localhost:5500/
+http://localhost:5500/coordinator-dashboard/
+http://localhost:5500/registration-page/
+http://localhost:5500/volunteer-page/
