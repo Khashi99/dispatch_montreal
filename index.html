@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Dispatch Montreal Prototype</title>
+	<style>
+		:root {
+			--bg: #f4f7fb;
+			--ink: #1f2937;
+			--muted: #6b7280;
+			--card: #ffffff;
+			--stroke: #e5e7eb;
+			--primary: #0f766e;
+			--primary-hover: #115e59;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			min-height: 100vh;
+			font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+			color: var(--ink);
+			background: radial-gradient(circle at top, #e8f8f3 0%, var(--bg) 48%);
+			display: grid;
+			place-items: center;
+			padding: 24px;
+		}
+
+		.container {
+			width: min(980px, 100%);
+			background: var(--card);
+			border: 1px solid var(--stroke);
+			border-radius: 16px;
+			box-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
+			padding: 28px;
+		}
+
+		h1 {
+			margin: 0;
+			font-size: 2rem;
+		}
+
+		.lead {
+			color: var(--muted);
+			margin: 8px 0 24px;
+			line-height: 1.5;
+		}
+
+		.grid {
+			display: grid;
+			gap: 14px;
+			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		}
+
+		.card {
+			border: 1px solid var(--stroke);
+			border-radius: 12px;
+			padding: 14px;
+			background: #fcfcfd;
+		}
+
+		.card h2 {
+			margin: 0 0 8px;
+			font-size: 1.05rem;
+		}
+
+		.card p {
+			margin: 0 0 12px;
+			color: var(--muted);
+			font-size: 0.95rem;
+			line-height: 1.4;
+		}
+
+		.btn {
+			display: inline-block;
+			text-decoration: none;
+			background: var(--primary);
+			color: #ffffff;
+			border-radius: 9px;
+			padding: 10px 12px;
+			font-weight: 600;
+		}
+
+		.btn:hover { background: var(--primary-hover); }
+	</style>
+</head>
+<body>
+	<main class="container">
+		<h1>Dispatch Montreal</h1>
+		<p class="lead">Prototype navigation hub for coordinator, registration, and volunteer interfaces.</p>
+
+		<section class="grid" aria-label="Prototype sections">
+			<article class="card">
+				<h2>Coordinator Dashboard</h2>
+				<p>Emergency events, resident management, volunteer matching, assignments, and reports.</p>
+				<a class="btn" href="coordinator-dashboard/">Open Coordinator Dashboard</a>
+			</article>
+
+			<article class="card">
+				<h2>Registration Page</h2>
+				<p>Resident registration prototype flow.</p>
+				<a class="btn" href="registration-page/">Open Registration Page</a>
+			</article>
+
+			<article class="card">
+				<h2>Volunteer Pages</h2>
+				<p>Volunteer login, notification feed, assignment details, and welfare check submission.</p>
+				<a class="btn" href="volunteer-page/">Open Volunteer Pages</a>
+			</article>
+		</section>
+	</main>
+</body>
+</html>
