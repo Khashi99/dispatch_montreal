@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dispatch Montreal - Assignment Reports</title>
+  <style>
+    :root {
+      --bg: #eef2f6;
+      --surface: #ffffff;
+      --surface-muted: #f7f9fc;
+      --sidebar: #1f3347;
+      --sidebar-hover: #2b4863;
+      --primary: #2f5d7c;
+      --primary-dark: #23445b;
+      --danger: #b94a48;
+      --danger-soft: #f6e2e1;
+      --warning: #b38728;
+      --warning-soft: #f8eed3;
+      --success: #3f7d5c;
+      --success-soft: #dceee3;
+      --info: #5a7ca0;
+      --info-soft: #e7eef6;
+      --text: #1f2933;
+      --text-soft: #617182;
+      --border: #d7dee7;
+      --shadow: 0 8px 24px rgba(31, 41, 51, 0.08);
+      --radius: 14px;
+      --transition: 0.2s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: var(--sidebar);
+      color: #fff;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .brand h1 {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .brand p {
+      color: #d3dde7;
+      font-size: 14px;
+    }
+
+    .nav {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav li {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 14px 12px;
+      border-radius: 10px;
+      cursor: default;
+      transition: var(--transition);
+    }
+
+    .nav li.active,
+    .nav li:hover {
+      background: var(--sidebar-hover);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 14px 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      font-size: 13px;
+      color: #d3dde7;
+      line-height: 1.5;
+    }
+
+    .main {
+      flex: 1;
+      padding: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .topbar-left h2 {
+      font-size: 38px;
+      margin-bottom: 6px;
+    }
+
+    .topbar-left p {
+      color: var(--text-soft);
+      font-size: 15px;
+    }
+
+    .topbar-right {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      box-shadow: var(--shadow);
+      font-size: 14px;
+      color: var(--text-soft);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .summary-card .label {
+      color: var(--text-soft);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .summary-card .value {
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .summary-card .sub {
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+
+    .status-banner {
+      background: var(--info-soft);
+      border: 1px solid #d2ddeb;
+      border-left: 6px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .status-banner h3 {
+      color: var(--primary-dark);
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .status-banner p {
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #73808c;
+      color: #fff;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: var(--primary-dark);
+      border: 1px solid var(--border);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h3 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .panel-subtitle {
+      color: var(--text-soft);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .report-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .report-card {
+      background: var(--surface-muted);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .report-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .report-top h4 {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .report-meta {
+      color: var(--text-soft);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 16px;
+      margin: 12px 0 14px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .report-note {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    .report-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .tag-safe {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .tag-help {
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .tag-emergency {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .tag-reviewed {
+      background: var(--info-soft);
+      color: var(--primary-dark);
+    }
+
+    .tag-high {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .tag-medium {
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .tag-low {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .mini-board {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mini-item {
+      background: var(--surface-muted);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .mini-item h4 {
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .mini-item p {
+      color: var(--text-soft);
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .table-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .table-panel h3 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .table-panel p {
+      color: var(--text-soft);
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 14px 12px;
+      border-bottom: 1px solid #e7edf3;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #edf3f8;
+      color: #34495c;
+      font-weight: bold;
+    }
+
+    .foot-note {
+      color: var(--text-soft);
+      font-size: 13px;
+      margin-top: 14px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1200px) {
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .layout {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .report-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+     .nav {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nav-item {
+    padding: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.08);
+    transition: 0.2s ease;
+  }
+
+  .nav-item:hover,
+  .nav-item.active {
+    background: #2b4863;
+  }
+
+  .nav-item a {
+    display: block;
+    width: 100%;
+    padding: 14px 12px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>Dispatch Montreal</h1>
+        <p>Coordinator Command Dashboard</p>
+      </div>
+
+<ul class="nav">
+  <li class="nav-item"><a href="dashboard.html">Dashboard</a></li>
+  <li class="nav-item"><a href="emergency-events.html">Emergency Events</a></li>
+  <li class="nav-item"><a href="residents.html">Residents</a></li>
+  <li class="nav-item"><a href="incident-volunteers.html">Volunteers</a></li>
+  <li class="nav-item"><a href="assignments.html">Assignments</a></li>
+  <li class="nav-item active"><a href="assignment-reports.html">Reports</a></li>
+  <li class="nav-item"><a href="index.html">Logout</a></li>
+</ul>
+
+      <div class="sidebar-footer">
+        Front-end prototype report screen.<br>
+        Volunteer outcomes and case summaries are mock data for the class presentation.
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h2>Assignment Reports</h2>
+          <p>Review volunteer-submitted outcomes, summarize resident conditions, and track what happened after each assignment.</p>
+        </div>
+        <div class="topbar-right">
+          Logged in: Community Hub Coordinator
+        </div>
+      </header>
+
+      <section class="summary-grid">
+        <div class="summary-card">
+          <div class="label">Reports Submitted</div>
+          <div class="value">5</div>
+          <div class="sub">Received from completed volunteer assignments</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Safe Outcomes</div>
+          <div class="value">3</div>
+          <div class="sub">Residents checked and confirmed safe</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Needs Help</div>
+          <div class="value">1</div>
+          <div class="sub">Follow-up support required</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Emergency Cases</div>
+          <div class="value">1</div>
+          <div class="sub">Escalated to emergency services</div>
+        </div>
+      </section>
+
+      <section class="status-banner">
+        <h3>Outcome Reporting Flow</h3>
+        <p>
+          This page represents the final part of the prototype sequence. After the volunteer completes a task,
+          they submit a result such as safe, needs help, or emergency, and the coordinator reviews that report
+          to decide whether the case should be closed or followed up.
+        </p>
+        <div class="button-row">
+          <button class="btn btn-primary">Review New Report</button>
+          <button class="btn btn-secondary">Filter by Outcome</button>
+          <button class="btn btn-outline">Export Summary</button>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div class="panel">
+          <h3>Volunteer Report Cards</h3>
+          <p class="panel-subtitle">Clear demo cards that help explain what the volunteer submitted back to the coordinator after visiting the resident.</p>
+
+          <div class="report-list">
+            <div class="report-card">
+              <div class="report-top">
+                <div>
+                  <h4>Report R-301 — Amina, 74</h4>
+                  <div class="report-meta">
+                    Submitted by: Omar H.<br>
+                    Assignment ID: A-106<br>
+                    Submitted: 09:02 AM
+                  </div>
+                </div>
+                <span class="tag tag-safe">Safe</span>
+              </div>
+
+              <div class="report-grid">
+                <div><strong>Resident Area:</strong> Rosemont</div>
+                <div><strong>Priority:</strong> <span class="tag tag-low">Low</span></div>
+                <div><strong>Visit Type:</strong> Wellness check</div>
+                <div><strong>Coordinator Review:</strong> <span class="tag tag-reviewed">Reviewed</span></div>
+              </div>
+
+              <div class="report-note">
+                Resident answered the door, confirmed she was safe, and did not require further assistance.
+                Heating and phone access were both available at the time of the visit.
+              </div>
+
+              <div class="report-actions">
+                <button class="btn btn-success">Close Case</button>
+                <button class="btn btn-outline">View Full Report</button>
+              </div>
+            </div>
+
+            <div class="report-card">
+              <div class="report-top">
+                <div>
+                  <h4>Report R-302 — Jean, 69</h4>
+                  <div class="report-meta">
+                    Submitted by: Sarah M.<br>
+                    Assignment ID: A-105<br>
+                    Submitted: 09:15 AM
+                  </div>
+                </div>
+                <span class="tag tag-help">Needs Help</span>
+              </div>
+
+              <div class="report-grid">
+                <div><strong>Resident Area:</strong> NDG</div>
+                <div><strong>Priority:</strong> <span class="tag tag-medium">Medium</span></div>
+                <div><strong>Visit Type:</strong> Phone + home follow-up</div>
+                <div><strong>Coordinator Review:</strong> <span class="tag tag-reviewed">Pending Review</span></div>
+              </div>
+
+              <div class="report-note">
+                Resident was reachable but sounded distressed and requested help with food and heating supplies.
+                Case should remain open for a follow-up visit or community support arrangement.
+              </div>
+
+              <div class="report-actions">
+                <button class="btn btn-primary">Arrange Follow-up</button>
+                <button class="btn btn-outline">Add Note</button>
+              </div>
+            </div>
+
+            <div class="report-card">
+              <div class="report-top">
+                <div>
+                  <h4>Report R-303 — Louise, 81</h4>
+                  <div class="report-meta">
+                    Submitted by: Julie T.<br>
+                    Assignment ID: A-107<br>
+                    Submitted: 09:28 AM
+                  </div>
+                </div>
+                <span class="tag tag-emergency">Emergency</span>
+              </div>
+
+              <div class="report-grid">
+                <div><strong>Resident Area:</strong> Verdun</div>
+                <div><strong>Priority:</strong> <span class="tag tag-high">High</span></div>
+                <div><strong>Visit Type:</strong> Emergency welfare visit</div>
+                <div><strong>Coordinator Review:</strong> <span class="tag tag-reviewed">Escalated</span></div>
+              </div>
+
+              <div class="report-note">
+                Resident required urgent escalation because electricity was needed for a medical device.
+                Emergency services were contacted immediately and the coordinator marked the case as escalated.
+              </div>
+
+              <div class="report-actions">
+                <button class="btn btn-primary">View Escalation Path</button>
+                <button class="btn btn-outline">Open Incident Log</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Report Insights</h3>
+          <p class="panel-subtitle">Compact side information to make the page feel more complete during the prototype demo.</p>
+
+          <div class="mini-board">
+            <div class="mini-item">
+              <h4>Most Common Outcome</h4>
+              <p>Most completed visits so far ended with residents being marked safe after a successful welfare check.</p>
+              <span class="tag tag-safe">Safe Trend</span>
+            </div>
+
+            <div class="mini-item">
+              <h4>Follow-up Needed</h4>
+              <p>One resident still needs additional assistance, so the coordinator should keep that case open.</p>
+              <span class="tag tag-help">Needs Action</span>
+            </div>
+
+            <div class="mini-item">
+              <h4>Emergency Path Confirmed</h4>
+              <p>The demo includes one escalated case to show how serious incidents move beyond volunteer support.</p>
+              <span class="tag tag-emergency">Escalated</span>
+            </div>
+
+            <div class="mini-item">
+              <h4>Average Response Time</h4>
+              <p>Mock reporting shows an average visit completion time of 26 minutes from assignment to outcome.</p>
+              <span class="tag tag-reviewed">Tracked</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="table-panel">
+        <h3>Assignment Report Summary Table</h3>
+        <p>Structured view of volunteer-submitted outcomes for a more formal presentation-ready dashboard page.</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Report ID</th>
+              <th>Resident</th>
+              <th>Volunteer</th>
+              <th>Area</th>
+              <th>Outcome</th>
+              <th>Next Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>R-301</td>
+              <td>Amina, 74</td>
+              <td>Omar H.</td>
+              <td>Rosemont</td>
+              <td><span class="tag tag-safe">Safe</span></td>
+              <td>Close case</td>
+            </tr>
+            <tr>
+              <td>R-302</td>
+              <td>Jean, 69</td>
+              <td>Sarah M.</td>
+              <td>NDG</td>
+              <td><span class="tag tag-help">Needs Help</span></td>
+              <td>Arrange follow-up support</td>
+            </tr>
+            <tr>
+              <td>R-303</td>
+              <td>Louise, 81</td>
+              <td>Julie T.</td>
+              <td>Verdun</td>
+              <td><span class="tag tag-emergency">Emergency</span></td>
+              <td>Escalated to emergency services</td>
+            </tr>
+            <tr>
+              <td>R-304</td>
+              <td>Marc, 72</td>
+              <td>David R.</td>
+              <td>Verdun</td>
+              <td><span class="tag tag-safe">Safe</span></td>
+              <td>Archive summary</td>
+            </tr>
+            <tr>
+              <td>R-305</td>
+              <td>Sophie, 67</td>
+              <td>Kevin L.</td>
+              <td>LaSalle</td>
+              <td><span class="tag tag-safe">Safe</span></td>
+              <td>No further action</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="foot-note">
+          This page completes your coordinator workflow: incidents create assignments, volunteers submit outcomes,
+          and the coordinator reviews reports to close, follow up, or escalate the case.
+        </p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
