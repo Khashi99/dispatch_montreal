@@ -629,6 +629,22 @@
                             <label for="volunteerNotes">Volunteer Notes</label>
                             <textarea id="volunteerNotes" name="volunteerNotes" placeholder="Optional notes such as mobility, first aid, transportation, or scheduling details"></textarea>
                         </div>
+
+                        <div class="field">
+                            <label for="kycDocumentType">KYC Document Type</label>
+                            <select id="kycDocumentType" name="kycDocumentType" required>
+                                <option value="">Select a document</option>
+                                <option value="Passport">Passport</option>
+                                <option value="National ID">ID</option>
+                                <option value="Social Security">SS</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="kycDocumentUpload">Upload Document</label>
+                            <input id="kycDocumentUpload" name="kycDocumentUpload" type="file" accept=".pdf,.jpg,.jpeg,.png" required />
+                            <span class="field-note">Accepted formats: PDF, JPG, JPEG, PNG.</span>
+                        </div>
                     </div>
 
                     <div class="password-row">
@@ -801,6 +817,8 @@
         const password = document.getElementById("signupPassword").value;
         const confirmPassword = document.getElementById("confirmPassword").value;
         const age = document.getElementById("age").value.trim();
+        const kycDocumentType = document.getElementById("kycDocumentType").value;
+        const kycDocumentUpload = document.getElementById("kycDocumentUpload").files;
 
         if (!age) {
             showStatus("error", "Please provide a valid date of birth so the age can be calculated.");
@@ -812,10 +830,16 @@
             return;
         }
 
+        if (!kycDocumentType || !kycDocumentUpload || kycDocumentUpload.length === 0) {
+            showStatus("error", "Please select a KYC document type and upload your document.");
+            return;
+        }
+
         showStatus(
             "success",
             "Thank you, " + firstName + " " + lastName + ". Your volunteer registration has been submitted. Confirmation details will be sent to " + email + "."
         );
+        window.alert("Request sent for KYC verification.");
         event.target.reset();
         ageInput.value = "";
     });
