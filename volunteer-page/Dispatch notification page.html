@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dispatch Montreal - Volunteer Notifications</title>
+    <style>
+        :root {
+            --bg: #eef2f6;
+            --surface: #ffffff;
+            --surface-muted: #f7f9fc;
+            --primary: #2f5d7c;
+            --primary-dark: #23445b;
+            --danger: #b94a48;
+            --danger-soft: #f6e2e1;
+            --warning: #b38728;
+            --warning-soft: #f8eed3;
+            --success: #3f7d5c;
+            --success-soft: #dceee3;
+            --text: #1f2933;
+            --text-soft: #617182;
+            --border: #d7dee7;
+            --shadow: 0 18px 40px rgba(31, 41, 51, 0.08);
+            --radius: 18px;
+            --transition: 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(47, 93, 124, 0.14), transparent 28%),
+                linear-gradient(160deg, #f7fafc 0%, #ecf2f7 52%, #e2eaf2 100%);
+            color: var(--text);
+        }
+
+        .page-shell {
+            max-width: 1260px;
+            margin: 0 auto;
+            padding: 28px 24px 40px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-mark {
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 14px 28px rgba(47, 93, 124, 0.22);
+        }
+
+        .brand-copy {
+            display: grid;
+            gap: 4px;
+        }
+
+        .brand-kicker {
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .brand-copy h1 {
+            font-size: 27px;
+            letter-spacing: -0.03em;
+        }
+
+        .brand-copy p {
+            color: var(--text-soft);
+            font-size: 14px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .status-pill {
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: bold;
+            background: var(--success-soft);
+            color: var(--success);
+            border: 1px solid #c6dfd0;
+        }
+
+        .ghost-btn,
+        .filter-btn,
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ghost-btn,
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .ghost-btn:hover,
+        .filter-btn:hover,
+        .btn:hover {
+            transform: translateY(-1px);
+            opacity: 0.95;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(31, 51, 71, 0.96), rgba(47, 93, 124, 0.94));
+            color: #fff;
+            border-radius: 26px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 22px;
+        }
+
+        .hero-copy {
+            max-width: 740px;
+        }
+
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .hero h2 {
+            font-size: 38px;
+            line-height: 1.04;
+            letter-spacing: -0.04em;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: #dfe8f1;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .hero-aside {
+            min-width: 240px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .hero-stat {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        .hero-stat .label {
+            color: #c9d6e2;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .hero-stat .value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .hero-stat .sub {
+            color: #dfe8f1;
+            font-size: 13px;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .summary-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .summary-card .label {
+            color: var(--text-soft);
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .value {
+            font-size: 30px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .summary-card .sub {
+            color: var(--text-soft);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .filters-panel {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            box-shadow: var(--shadow);
+            margin-bottom: 18px;
+        }
+
+        .filters-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .filters-top h3 {
+            font-size: 22px;
+        }
+
+        .filters-top p {
+            color: var(--text-soft);
+            font-size: 14px;
+        }
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .filter-note {
+            color: var(--text-soft);
+            font-size: 14px;
+        }
+
+        .dispatch-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .assignment-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .assignment-card[hidden] {
+            display: none;
+        }
+
+        .assignment-card summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .assignment-card summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .card-copy {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .tag-high {
+            background: var(--danger-soft);
+            color: var(--danger);
+        }
+
+        .tag-medium {
+            background: var(--warning-soft);
+            color: var(--warning);
+        }
+
+        .tag-low {
+            background: var(--success-soft);
+            color: var(--success);
+        }
+
+        .tag-area {
+            background: #edf3f8;
+            color: #425466;
+        }
+
+        .card-copy h4 {
+            font-size: 22px;
+            line-height: 1.2;
+            margin-bottom: 10px;
+        }
+
+        .card-copy p {
+            color: var(--text-soft);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .card-meta {
+            min-width: 128px;
+            display: grid;
+            justify-items: end;
+            gap: 10px;
+            text-align: right;
+        }
+
+        .card-time {
+            font-size: 13px;
+            color: var(--text-soft);
+            font-weight: bold;
+        }
+
+        .card-deadline {
+            font-size: 13px;
+            color: var(--primary);
+            background: rgba(47, 93, 124, 0.08);
+            padding: 7px 10px;
+            border-radius: 999px;
+        }
+
+        .card-chevron {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            background: #edf3f8;
+            color: var(--primary-dark);
+            display: grid;
+            place-items: center;
+            font-size: 18px;
+            transition: transform var(--transition);
+        }
+
+        .assignment-card[open] .card-chevron {
+            transform: rotate(180deg);
+        }
+
+        .card-body {
+            padding: 0 20px 20px;
+            border-top: 1px solid #ecf1f5;
+            display: grid;
+            gap: 18px;
+        }
+
+        .info-grid {
+            padding-top: 18px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .info-item {
+            background: var(--surface-muted);
+            border: 1px solid #e7edf3;
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .info-item span {
+            display: block;
+            color: var(--text-soft);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .info-item strong,
+        .info-item p {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .info-item p {
+            color: var(--text);
+        }
+
+        .instructions-box {
+            background: #f8fbfd;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .instructions-box h5 {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .instructions-box p {
+            color: var(--text-soft);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #73808c;
+            color: #fff;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: var(--primary-dark);
+            border: 1px solid var(--border);
+        }
+
+        .empty-state {
+            display: none;
+            background: var(--surface);
+            border: 1px dashed var(--border);
+            border-radius: 22px;
+            padding: 34px 22px;
+            text-align: center;
+            color: var(--text-soft);
+            box-shadow: var(--shadow);
+        }
+
+        .empty-state.show {
+            display: block;
+        }
+
+        @media (max-width: 1080px) {
+            .summary-grid,
+            .dispatch-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .hero {
+                flex-direction: column;
+            }
+
+            .hero-aside {
+                width: 100%;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            .page-shell {
+                padding: 22px 16px 32px;
+            }
+
+            .topbar,
+            .card-meta,
+            .card-actions {
+                align-items: flex-start;
+            }
+
+            .topbar,
+            .assignment-card summary {
+                flex-direction: column;
+            }
+
+            .hero,
+            .summary-grid,
+            .dispatch-grid,
+            .hero-aside,
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid,
+            .dispatch-grid {
+                display: grid;
+            }
+
+            .hero h2 {
+                font-size: 31px;
+            }
+
+            .card-meta {
+                justify-items: start;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page-shell">
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">DM</div>
+            <div class="brand-copy">
+                <span class="brand-kicker">Dispatch Montreal</span>
+                <h1>Volunteer Notifications</h1>
+                <p>Emergency assignments waiting for volunteer response</p>
+            </div>
+        </div>
+
+        <div class="topbar-actions">
+            <span class="status-pill">Status: Available</span>
+            <button class="ghost-btn" type="button" onclick="window.location.reload()">Refresh Feed</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-copy">
+            <span class="hero-kicker">Active Dispatch Queue</span>
+            <h2>Emergency notifications ready for review</h2>
+            <p id="heroMessage">
+                You have 4 active dispatches. Open a notification block to see the resident name,
+                address, special needs, and response instructions before leaving.
+            </p>
+        </div>
+
+        <div class="hero-aside">
+            <div class="hero-stat">
+                <div class="label">Visible Assignments</div>
+                <div class="value" id="visibleCount">4</div>
+                <div class="sub">Updates based on the current filter.</div>
+            </div>
+
+            <div class="hero-stat">
+                <div class="label">Next Recommended Action</div>
+                <div class="value" id="priorityHeadline">High Priority</div>
+                <div class="sub">Start with the highest-priority case shown below.</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="summary-grid">
+        <article class="summary-card">
+            <div class="label">Showing</div>
+            <div class="value" id="summaryShowing">4</div>
+            <div class="sub">Assignments currently visible on screen</div>
+        </article>
+
+        <article class="summary-card">
+            <div class="label">High Priority</div>
+            <div class="value" id="summaryHigh">1</div>
+            <div class="sub">Urgent visits that should be reviewed first</div>
+        </article>
+
+        <article class="summary-card">
+            <div class="label">Neighborhoods</div>
+            <div class="value" id="summaryAreas">4</div>
+            <div class="sub">Montreal areas represented in the current queue</div>
+        </article>
+
+        <article class="summary-card">
+            <div class="label">Expanded Card</div>
+            <div class="value" id="summaryOpen">1</div>
+            <div class="sub">Notification currently opened for review</div>
+        </article>
+    </section>
+
+    <section class="filters-panel">
+        <div class="filters-top">
+            <div>
+                <h3>Emergency Dispatches</h3>
+                <p>Click any block to expand the resident details and response notes.</p>
+            </div>
+            <p class="filter-note" id="filterNote">Showing all emergency assignments.</p>
+        </div>
+
+        <div class="filter-row">
+            <div class="filter-group">
+                <button class="filter-btn active" type="button" data-filter="all">All</button>
+                <button class="filter-btn" type="button" data-filter="high">High Priority</button>
+                <button class="filter-btn" type="button" data-filter="medium">Medium Priority</button>
+                <button class="filter-btn" type="button" data-filter="low">Low Priority</button>
+            </div>
+
+            <a class="ghost-btn" href="mailto:volunteers@dispatchmontreal.ca">Volunteer Support</a>
+        </div>
+    </section>
+
+    <section class="dispatch-grid" id="dispatchGrid">
+        <details
+            class="assignment-card"
+            data-priority="high"
+            data-area="Verdun"
+            open
+        >
+            <summary>
+                <div class="card-copy">
+                    <div class="card-tags">
+                        <span class="tag tag-high">High Priority</span>
+                        <span class="tag tag-area">Verdun</span>
+                    </div>
+                    <h4>Building Power Outage Welfare Check</h4>
+                    <p>
+                        Resident: Marguerite Levesque. Limited mobility and temperature-sensitive medication
+                        require an in-person check as soon as possible.
+                    </p>
+                </div>
+
+                <div class="card-meta">
+                    <span class="card-time">2 minutes ago</span>
+                    <span class="card-deadline">Respond within 15 min</span>
+                    <span class="card-chevron">⌄</span>
+                </div>
+            </summary>
+
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span>Name</span>
+                        <strong>Marguerite Levesque, 78</strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Address</span>
+                        <p>214 Rue Wellington, Verdun</p>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Special Needs</span>
+                        <p>Limited mobility, diabetes, refrigerated insulin, lives alone</p>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Access Notes</span>
+                        <p>Buzz apartment 302. Knock loudly if intercom does not answer.</p>
+                    </div>
+                </div>
+
+                <div class="instructions-box">
+                    <h5>Coordinator Note</h5>
+                    <p>
+                        Check room temperature, confirm medication storage, and escalate immediately if there is
+                        no response after two contact attempts.
+                    </p>
+                </div>
+
+                <div class="card-actions">
+                    <a class="btn btn-primary" href="./Assignment details.html?assignment=verdun-power">More Details</a>
+                    <a class="btn btn-outline" href="tel:+15145550184">Call Coordinator</a>
+                </div>
+            </div>
+        </details>
+
+        <details
+            class="assignment-card"
+            data-priority="medium"
+            data-area="NDG"
+        >
+            <summary>
+                <div class="card-copy">
+                    <div class="card-tags">
+                        <span class="tag tag-medium">Medium Priority</span>
+                        <span class="tag tag-area">NDG</span>
+                    </div>
+                    <h4>Extreme Cold Wellness Visit</h4>
+                    <p>
+                        Resident: Jean Tremblay. Follow up after a heating complaint and confirm the resident
+                        has warm clothing and working phone access.
+                    </p>
+                </div>
+
+                <div class="card-meta">
+                    <span class="card-time">9 minutes ago</span>
+                    <span class="card-deadline">Respond within 30 min</span>
+                    <span class="card-chevron">⌄</span>
+                </div>
+            </summary>
+
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span>Name</span>
+                        <strong>Jean Tremblay, 69</strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Address</span>
+                        <p>88 Avenue Somerled, NDG</p>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Special Needs</span>
+                        <p>Lives alone, reduced hearing, needs phone battery support</p>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Access Notes</span>
+                        <p>Rear entrance is easier to access. Resident prefers a phone call on arrival.</p>
+                    </div>
+                </div>
+
+                <div class="instructions-box">
+                    <h5>Coordinator Note</h5>
+                    <p>
+                        Confirm home heat, check whether the resident needs blankets or a warming center transfer,
+                        and document any signs of distress.
+                    </p>
+                </div>
+
+                <div class="card-actions">
+                    <a class="btn btn-primary" href="./Assignment details.html?assignment=ndg-cold">More Details</a>
+                    <a class="btn btn-outline" href="tel:+15145550184">Call Coordinator</a>
+                </div>
+            </div>
+        </details>
+
+        <details
+            class="assignment-card"
+            data-priority="medium"
+            data-area="Rosemont"
+        >
+            <summary>
+                <div class="card-copy">
+                    <div class="card-tags">
+                        <span class="tag tag-medium">Medium Priority</span>
+                        <span class="tag tag-area">Rosemont</span>
+                    </div>
+                    <h4>Hydration And Welfare Check</h4>
+                    <p>
+                        Resident: Amina Rahman. Complete a quick wellness visit during the heat advisory and
+                        verify available drinking water and fan access.
+                    </p>
+                </div>
+
+                <div class="card-meta">
+                    <span class="card-time">14 minutes ago</span>
+                    <span class="card-deadline">Respond within 45 min</span>
+                    <span class="card-chevron">⌄</span>
+                </div>
+            </summary>
+
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span>Name</span>
+                        <strong>Amina Rahman, 74</strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Address</span>
+                        <p>5030 Rue Beaubien, Rosemont</p>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Special Needs</span>
+                        <p>Uses a cane, needs hydration reminders, avoids stairs when possible</p>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Access Notes</span>
+                        <p>Second floor with elevator access. Resident responds best in English.</p>
+                    </div>
+                </div>
+
+                <div class="instructions-box">
+                    <h5>Coordinator Note</h5>
+                    <p>
+                        Offer bottled water if needed, check the fan and air circulation, and report any signs
+                        of dizziness, dehydration, or confusion.
+                    </p>
+                </div>
+
+                <div class="card-actions">
+                    <a class="btn btn-primary" href="./Assignment details.html?assignment=rosemont-heat">More Details</a>
+                    <a class="btn btn-outline" href="tel:+15145550184">Call Coordinator</a>
+                </div>
+            </div>
+        </details>
+
+        <details
+            class="assignment-card"
+            data-priority="low"
+            data-area="Ville-Marie"
+        >
+            <summary>
+                <div class="card-copy">
+                    <div class="card-tags">
+                        <span class="tag tag-low">Low Priority</span>
+                        <span class="tag tag-area">Ville-Marie</span>
+                    </div>
+                    <h4>Elevator Outage Follow-Up</h4>
+                    <p>
+                        Resident: Robert Chen. A follow-up visit is needed after an elevator outage left the
+                        resident unable to pick up groceries independently.
+                    </p>
+                </div>
+
+                <div class="card-meta">
+                    <span class="card-time">27 minutes ago</span>
+                    <span class="card-deadline">Respond within 60 min</span>
+                    <span class="card-chevron">⌄</span>
+                </div>
+            </summary>
+
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span>Name</span>
+                        <strong>Robert Chen, 72</strong>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Address</span>
+                        <p>4250 Rue Sherbrooke Ouest, Ville-Marie</p>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Special Needs</span>
+                        <p>Uses a walker, mild anxiety, requests clear arrival updates</p>
+                    </div>
+
+                    <div class="info-item">
+                        <span>Access Notes</span>
+                        <p>Concierge desk can let volunteers in after confirming assignment name.</p>
+                    </div>
+                </div>
+
+                <div class="instructions-box">
+                    <h5>Coordinator Note</h5>
+                    <p>
+                        Confirm food access, verify elevator restoration status, and check whether the resident
+                        needs assistance with medication pickup or grocery delivery.
+                    </p>
+                </div>
+
+                <div class="card-actions">
+                    <a class="btn btn-primary" href="./Assignment details.html?assignment=villemarie-elevator">More Details</a>
+                    <a class="btn btn-outline" href="tel:+15145550184">Call Coordinator</a>
+                </div>
+            </div>
+        </details>
+    </section>
+
+    <div class="empty-state" id="emptyState">
+        No assignments match this filter. Change the priority filter to view other emergencies.
+    </div>
+</div>
+
+<script>
+    const cards = Array.from(document.querySelectorAll(".assignment-card"));
+    const filterButtons = Array.from(document.querySelectorAll(".filter-btn"));
+    const visibleCount = document.getElementById("visibleCount");
+    const summaryShowing = document.getElementById("summaryShowing");
+    const summaryHigh = document.getElementById("summaryHigh");
+    const summaryAreas = document.getElementById("summaryAreas");
+    const summaryOpen = document.getElementById("summaryOpen");
+    const filterNote = document.getElementById("filterNote");
+    const heroMessage = document.getElementById("heroMessage");
+    const priorityHeadline = document.getElementById("priorityHeadline");
+    const emptyState = document.getElementById("emptyState");
+
+    function getVisibleCards() {
+        return cards.filter((card) => !card.hidden);
+    }
+
+    function updateDashboard() {
+        const visibleCards = getVisibleCards();
+        const openVisibleCards = visibleCards.filter((card) => card.open);
+        const highVisibleCards = visibleCards.filter((card) => card.dataset.priority === "high");
+        const areas = new Set(visibleCards.map((card) => card.dataset.area));
+
+        visibleCount.textContent = visibleCards.length;
+        summaryShowing.textContent = visibleCards.length;
+        summaryHigh.textContent = highVisibleCards.length;
+        summaryAreas.textContent = areas.size;
+        summaryOpen.textContent = openVisibleCards.length;
+
+        if (highVisibleCards.length > 0) {
+            priorityHeadline.textContent = "High Priority";
+        } else if (visibleCards.some((card) => card.dataset.priority === "medium")) {
+            priorityHeadline.textContent = "Medium Priority";
+        } else if (visibleCards.length > 0) {
+            priorityHeadline.textContent = "Low Priority";
+        } else {
+            priorityHeadline.textContent = "No Results";
+        }
+
+        heroMessage.textContent =
+            "You have " + visibleCards.length + " active dispatch" +
+            (visibleCards.length === 1 ? "" : "es") +
+            ". Open a notification block to see the resident name, address, special needs, and response instructions before leaving.";
+
+        emptyState.classList.toggle("show", visibleCards.length === 0);
+    }
+
+    function applyFilter(filter) {
+        filterButtons.forEach((button) => {
+            const isActive = button.dataset.filter === filter;
+            button.classList.toggle("active", isActive);
+            button.setAttribute("aria-pressed", isActive ? "true" : "false");
+        });
+
+        cards.forEach((card) => {
+            card.hidden = !(filter === "all" || card.dataset.priority === filter);
+        });
+
+        const visibleCards = getVisibleCards();
+        const openVisibleCards = visibleCards.filter((card) => card.open);
+
+        if (visibleCards.length > 0 && openVisibleCards.length === 0) {
+            visibleCards[0].open = true;
+        }
+
+        if (filter === "all") {
+            filterNote.textContent = "Showing all emergency assignments.";
+        } else {
+            filterNote.textContent = "Showing only " + filter + "-priority assignments.";
+        }
+
+        updateDashboard();
+    }
+
+    cards.forEach((card) => {
+        card.addEventListener("toggle", () => {
+            if (card.open) {
+                cards.forEach((otherCard) => {
+                    if (otherCard !== card) {
+                        otherCard.open = false;
+                    }
+                });
+            }
+
+            updateDashboard();
+        });
+    });
+
+    filterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            applyFilter(button.dataset.filter);
+        });
+    });
+
+    applyFilter("all");
+</script>
+</body>
+</html>
