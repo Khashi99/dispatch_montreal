@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dispatch Montreal - Review & Consent</title>
+    <style>
+        :root {
+            --bg:#eef2f6; --surface:#fff; --surface-muted:#f7f9fc;
+            --primary:#2f5d7c; --primary-dark:#23445b;
+            --danger:#b94a48; --danger-soft:#f6e2e1;
+            --success:#3f7d5c; --success-soft:#dceee3;
+            --text:#1f2933; --text-soft:#617182;
+            --border:#d7dee7; --shadow:0 8px 24px rgba(31,41,51,.08);
+            --radius:14px; --transition:.2s ease;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+        body{min-height:100vh;background:radial-gradient(circle at top left,rgba(47,93,124,.14),transparent 30%),linear-gradient(160deg,#f7fafc 0%,#edf3f8 54%,#e3ebf2 100%);color:var(--text);}
+        .page-shell{max-width:860px;margin:0 auto;padding:28px 24px 60px;}
+        .topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px;flex-wrap:wrap;}
+        .brand{display:flex;align-items:center;gap:14px;}
+        .brand-mark{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:#fff;display:grid;place-items:center;font-size:18px;font-weight:bold;box-shadow:0 10px 22px rgba(47,93,124,.22);}
+        .brand-kicker{color:var(--primary);font-size:12px;font-weight:bold;letter-spacing:.08em;text-transform:uppercase;}
+        .brand-title{font-size:22px;font-weight:bold;letter-spacing:-.02em;}
+        .brand-sub{color:var(--text-soft);font-size:13px;}
+        .back-link{text-decoration:none;background:rgba(255,255,255,.9);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:bold;color:var(--text);}
+        .progress-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;box-shadow:var(--shadow);margin-bottom:22px;}
+        .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+        .progress-header h3{font-size:16px;} .progress-header p{color:var(--text-soft);font-size:13px;}
+        .steps-track{display:flex;align-items:center;}
+        .step-item{display:flex;align-items:center;flex:1;} .step-item:last-child{flex:0 0 auto;}
+        .step-dot{width:32px;height:32px;border-radius:999px;display:grid;place-items:center;font-size:13px;font-weight:bold;flex-shrink:0;border:2px solid var(--border);background:var(--surface-muted);color:var(--text-soft);}
+        .step-item.active .step-dot{background:var(--primary);border-color:var(--primary);color:#fff;}
+        .step-item.done   .step-dot{background:var(--success);border-color:var(--success);color:#fff;}
+        .step-connector{flex:1;height:2px;background:var(--border);margin:0 4px;}
+        .form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;position:relative;}
+        .form-card::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,var(--primary) 0%,#4b7fa3 55%,#8ab4cf 100%);}
+        .form-body{padding:28px;}
+        .section-kicker{color:var(--primary);font-size:12px;font-weight:bold;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+        .form-body h3{font-size:26px;letter-spacing:-.02em;margin-bottom:8px;}
+        .form-body>p{color:var(--text-soft);font-size:14px;line-height:1.7;margin-bottom:22px;}
+        .review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:22px;}
+        .review-card{background:var(--surface-muted);border:1px solid #e7edf3;border-radius:12px;padding:14px;}
+        .r-label{color:var(--text-soft);font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+        .r-value{font-size:14px;font-weight:bold;line-height:1.5;word-break:break-word;}
+        .r-value.empty{color:var(--text-soft);font-weight:normal;font-style:italic;}
+        .r-value.tags{font-weight:normal;font-size:13px;}
+        .divider{border:none;border-top:1px solid var(--border);margin:22px 0;}
+        .sub-heading{font-size:18px;font-weight:bold;margin-bottom:14px;}
+        .consent-block{border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;background:#f9fbfd;}
+        .consent-block h5{font-size:15px;margin-bottom:8px;}
+        .consent-block p{font-size:13px;color:var(--text-soft);line-height:1.7;margin-bottom:14px;}
+        .consent-row{display:flex;align-items:flex-start;gap:12px;}
+        .consent-row input[type="checkbox"]{width:18px;height:18px;padding:0;margin-top:2px;flex-shrink:0;accent-color:var(--primary);cursor:pointer;}
+        .consent-row label{font-size:14px;font-weight:normal;line-height:1.6;cursor:pointer;}
+        .status-banner{display:none;border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:14px;line-height:1.6;}
+        .status-banner.show{display:block;}
+        .status-banner.error{background:var(--danger-soft);border:1px solid #e5c3c1;color:var(--danger);}
+        .form-nav{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:22px 28px;border-top:1px solid var(--border);flex-wrap:wrap;}
+        .nav-note{color:var(--text-soft);font-size:13px;max-width:280px;}
+        .nav-right{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;}
+        .btn{border:none;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:var(--transition);font-family:Arial,sans-serif;}
+        .btn:hover{transform:translateY(-1px);opacity:.95;}
+        .btn-primary{background:var(--primary);color:#fff;}
+        .btn-success{background:var(--success);color:#fff;}
+        .btn-ghost{background:rgba(255,255,255,.9);color:var(--text);border:1px solid var(--border);}
+        .success-screen{display:none;padding:48px 28px;text-align:center;}
+        .success-screen.active{display:block;}
+        .success-icon{width:72px;height:72px;border-radius:999px;background:var(--success-soft);border:2px solid #b2d9c3;color:var(--success);display:grid;place-items:center;font-size:32px;margin:0 auto 20px;}
+        .success-screen h3{font-size:30px;letter-spacing:-.03em;margin-bottom:12px;}
+        .success-screen>p{color:var(--text-soft);font-size:15px;line-height:1.7;max-width:520px;margin:0 auto 22px;}
+        .success-ref{display:inline-block;background:rgba(47,93,124,.08);border:1px solid rgba(47,93,124,.18);color:var(--primary-dark);border-radius:12px;padding:10px 18px;font-size:14px;font-weight:bold;letter-spacing:.04em;margin-bottom:28px;}
+        .success-details{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:640px;margin:0 auto 28px;text-align:left;}
+        .sd-card{background:var(--surface-muted);border:1px solid var(--border);border-radius:12px;padding:14px;}
+        .sd-label{font-size:12px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+        .sd-value{font-size:14px;font-weight:bold;}
+        .success-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;}
+        .coordinator-link{margin-top:18px;font-size:13px;color:var(--text-soft);}
+        .coordinator-link a{color:var(--primary);font-weight:bold;text-decoration:none;}
+        .coordinator-link a:hover{color:var(--primary-dark);}
+        @media(max-width:640px){
+            .review-grid,.success-details{grid-template-columns:1fr;}
+            .form-body{padding:20px;}
+            .form-nav{padding:18px 20px;flex-direction:column;align-items:stretch;}
+            .btn{justify-content:center;}
+        }
+    </style>
+</head>
+<body>
+<div class="page-shell">
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">DM</div>
+            <div>
+                <div class="brand-kicker">Dispatch Montreal</div>
+                <div class="brand-title">Resident Registration</div>
+                <div class="brand-sub">Step 4 of 4</div>
+            </div>
+        </div>
+        <a class="back-link" href="emergency-contacts.html">← Back</a>
+    </header>
+
+    <div class="progress-bar">
+        <div class="progress-header">
+            <h3>Step 4 of 4 — Review &amp; Consent</h3>
+            <p>Check your details and acknowledge all consent statements</p>
+        </div>
+        <div class="steps-track">
+            <div class="step-item done"><div class="step-dot">✓</div></div>
+            <div class="step-connector"></div>
+            <div class="step-item done"><div class="step-dot">✓</div></div>
+            <div class="step-connector"></div>
+            <div class="step-item done"><div class="step-dot">✓</div></div>
+            <div class="step-connector"></div>
+            <div class="step-item active"><div class="step-dot">4</div></div>
+        </div>
+    </div>
+
+    <div class="form-card" id="formCard">
+        <div class="form-body" id="reviewBody">
+            <div class="section-kicker">Step 4 of 4</div>
+            <h3>Review &amp; Consent</h3>
+            <p>Please review your information below. Read and acknowledge each consent statement before submitting. Go back to edit any section if needed.</p>
+            <div class="status-banner" id="statusBanner"></div>
+            <div class="sub-heading">Your Information</div>
+            <div class="review-grid" id="reviewGrid"></div>
+            <hr class="divider" />
+            <div class="sub-heading">Consent Statements</div>
+            <div class="consent-block">
+                <h5>Data Collection &amp; Storage</h5>
+                <p>I understand that the personal information entered — including the resident's address, health conditions, and emergency contacts — will be stored securely in the Dispatch Montreal vulnerability registry, hosted on AWS Canada (Montréal). Data is encrypted at rest and in transit and is subject to a Privacy Impact Assessment under Québec's Law 25.</p>
+                <div class="consent-row">
+                    <input type="checkbox" id="consentData" />
+                    <label for="consentData">I consent to the collection and secure storage of this personal information for the purpose of emergency welfare checks.</label>
+                </div>
+            </div>
+            <div class="consent-block">
+                <h5>Information Sharing with Volunteers</h5>
+                <p>I understand that during an active emergency affecting this resident's area, the minimum necessary details (name, address, floor level, and relevant health flags) will be shared with a screened volunteer assigned through a partner organization such as the Canadian Red Cross or St. John Ambulance.</p>
+                <div class="consent-row">
+                    <input type="checkbox" id="consentShare" />
+                    <label for="consentShare">I consent to the limited sharing of this information with assigned volunteers for the purpose of conducting welfare checks.</label>
+                </div>
+            </div>
+            <div class="consent-block">
+                <h5>Emergency Contact Notifications</h5>
+                <p>I confirm that the emergency contacts listed have been informed that they may receive automated SMS or email notifications during emergency events affecting this resident, and that they have consented to receiving these communications.</p>
+                <div class="consent-row">
+                    <input type="checkbox" id="consentContacts" />
+                    <label for="consentContacts">I confirm that the listed emergency contacts have been informed and have agreed to receive welfare check status notifications.</label>
+                </div>
+            </div>
+            <div class="consent-block">
+                <h5>Accuracy of Information</h5>
+                <p>I confirm that all information provided is accurate to the best of my knowledge. I understand that outdated or incorrect details — particularly address or health information — may delay or prevent an effective welfare check response.</p>
+                <div class="consent-row">
+                    <input type="checkbox" id="consentAccuracy" />
+                    <label for="consentAccuracy">I confirm the information provided is accurate and I will notify Dispatch Montreal of any significant changes.</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-nav" id="formNav">
+            <a class="btn btn-ghost" href="emergency-contacts.html">← Back</a>
+            <div class="nav-right">
+                <p class="nav-note">All four consent boxes must be checked to submit.</p>
+                <button class="btn btn-success" onclick="submitRegistration()">Submit Registration ✓</button>
+            </div>
+        </div>
+
+        <div class="success-screen" id="successScreen">
+            <div class="success-icon">✓</div>
+            <h3>Registration Submitted</h3>
+            <p>The resident has been added to the Dispatch Montreal vulnerability registry. During the next emergency trigger in their area, trained volunteers will be dispatched to perform a welfare check.</p>
+            <div class="success-ref" id="successRef">Reference: DM-2026-0483</div>
+            <div class="success-details" id="successDetails"></div>
+            <div class="success-actions">
+                <a class="btn btn-ghost" href="index.html">Register Another Resident</a>
+                <button class="btn btn-primary" onclick="window.print()">Print Confirmation</button>
+            </div>
+            <p class="coordinator-link">
+                Coordinator? <a href="../coordinator-dashboard/residents.html">View updated resident list →</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+    function buildReview() {
+        const p = JSON.parse(sessionStorage.getItem("reg_personal") || "{}");
+        const h = JSON.parse(sessionStorage.getItem("reg_health")   || "{}");
+        const c = JSON.parse(sessionStorage.getItem("reg_contacts") || "{}");
+        const fields = [
+            { label:"Full Name",        value:(p.firstName||"")+" "+(p.lastName||"") },
+            { label:"Date of Birth",    value:p.dob||"" },
+            { label:"Phone",            value:p.phone||"" },
+            { label:"Email",            value:p.email||"Not provided" },
+            { label:"Language",         value:p.preferredLang||"" },
+            { label:"Living Situation", value:p.livingSituation||"" },
+            { label:"Address",          value:[p.streetAddress,p.apartment,p.postalCode].filter(Boolean).join(", ") },
+            { label:"Borough",          value:p.borough||"" },
+            { label:"Floor Level",      value:p.buildingFloor||"" },
+            { label:"Primary Contact",  value:c.ec1FirstName?(c.ec1FirstName+" "+c.ec1LastName+" ("+c.ec1Relationship+")"):"" },
+            { label:"Contact Phone",    value:c.ec1Phone||"" },
+            { label:"Notifications",    value:c.ec1NotifMethod||"" },
+        ];
+        const grid = document.getElementById("reviewGrid");
+        grid.innerHTML = fields.map(f=>{
+            const empty=!f.value||f.value.trim()===""||f.value===" ";
+            return `<div class="review-card"><div class="r-label">${f.label}</div><div class="r-value ${empty?"empty":""}">${empty?"Not provided":esc(f.value)}</div></div>`;
+        }).join("");
+        grid.innerHTML += [
+            { label:"Health Conditions",    value:(h.health||[]).join(", ")||"None selected" },
+            { label:"Mobility / Physical",  value:(h.mobility||[]).join(", ")||"None selected" },
+            { label:"Electrical Equipment", value:(h.equipment||[]).join(", ")||"None selected" },
+        ].map(f=>`<div class="review-card"><div class="r-label">${f.label}</div><div class="r-value tags">${esc(f.value)}</div></div>`).join("");
+    }
+
+    function getRisk(health, equipment) {
+        const highEquip = ["Oxygen concentrator","Home dialysis","Powered wheelchair"];
+        const medHealth = ["Type 2 diabetes","Cardiovascular disease","Respiratory illness","Cognitive impairment"];
+        if (equipment.some(e => highEquip.includes(e))) return "High";
+        if (health.some(h => medHealth.includes(h)))    return "Medium";
+        return "Low";
+    }
+
+    function submitRegistration() {
+        const consents = ["consentData","consentShare","consentContacts","consentAccuracy"];
+        const unchecked = consents.filter(id => !document.getElementById(id).checked);
+        if (unchecked.length > 0) {
+            const b = document.getElementById("statusBanner");
+            b.className = "status-banner show error";
+            b.textContent = "Please acknowledge all 4 consent statements before submitting.";
+            b.scrollIntoView({ behavior:"smooth", block:"nearest" });
+            return;
+        }
+
+        const p = JSON.parse(sessionStorage.getItem("reg_personal") || "{}");
+        const h = JSON.parse(sessionStorage.getItem("reg_health")   || "{}");
+        const c = JSON.parse(sessionStorage.getItem("reg_contacts") || "{}");
+
+        const ref  = "DM-2026-0" + (Math.floor(Math.random()*400)+483).toString().padStart(3,"0");
+        const risk = getRisk(h.health||[], h.equipment||[]);
+
+        // ── Save to localStorage so coordinator's residents.html can read it ──
+        const newResident = {
+            ref,
+            firstName:    p.firstName    || "",
+            lastName:     p.lastName     || "",
+            age:          p.age          || "—",
+            borough:      p.borough      || "—",
+            floor:        p.buildingFloor|| "—",
+            living:       p.livingSituation || "—",
+            phone:        p.phone        || "—",
+            address:      [p.streetAddress, p.apartment].filter(Boolean).join(", ") || "—",
+            postalCode:   p.postalCode   || "—",
+            health:       (h.health||[]).join(", ")    || "None noted",
+            mobility:     (h.mobility||[]).join(", ")  || "None noted",
+            equipment:    (h.equipment||[]).join(", ") || "None",
+            contact:      c.ec1FirstName ? (c.ec1FirstName+" "+c.ec1LastName) : "—",
+            contactPhone: c.ec1Phone || "—",
+            risk,
+            registeredAt: new Date().toLocaleString("en-CA"),
+        };
+
+        const existing = JSON.parse(localStorage.getItem("dm_registered_residents") || "[]");
+        existing.push(newResident);
+        localStorage.setItem("dm_registered_residents", JSON.stringify(existing));
+
+        // ── Success screen ──
+        document.getElementById("successRef").textContent = "Reference: " + ref;
+        document.getElementById("successDetails").innerHTML = [
+            { label:"Resident",        value:(p.firstName||"")+" "+(p.lastName||"") },
+            { label:"Borough",         value:p.borough||"—" },
+            { label:"Floor Level",     value:p.buildingFloor||"—" },
+            { label:"Risk Level",      value:risk },
+            { label:"Primary Contact", value:c.ec1FirstName?(c.ec1FirstName+" "+c.ec1LastName):"—" },
+            { label:"Reference",       value:ref },
+        ].map(d=>`<div class="sd-card"><div class="sd-label">${d.label}</div><div class="sd-value">${esc(d.value)}</div></div>`).join("");
+
+        document.getElementById("reviewBody").style.display = "none";
+        document.getElementById("formNav").style.display    = "none";
+        document.getElementById("successScreen").classList.add("active");
+
+        sessionStorage.removeItem("reg_personal");
+        sessionStorage.removeItem("reg_health");
+        sessionStorage.removeItem("reg_contacts");
+        window.scrollTo({ top:0, behavior:"smooth" });
+    }
+
+    buildReview();
+</script>
+</body>
+</html>

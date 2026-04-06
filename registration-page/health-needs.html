@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dispatch Montreal - Health & Needs</title>
+    <style>
+        :root {
+            --bg: #eef2f6; --surface: #ffffff; --surface-muted: #f7f9fc;
+            --primary: #2f5d7c; --primary-dark: #23445b;
+            --danger: #b94a48; --danger-soft: #f6e2e1;
+            --success: #3f7d5c; --success-soft: #dceee3;
+            --text: #1f2933; --text-soft: #617182;
+            --border: #d7dee7; --shadow: 0 8px 24px rgba(31,41,51,.08);
+            --radius: 14px; --transition: .2s ease;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, rgba(47,93,124,.14), transparent 30%),
+                        linear-gradient(160deg,#f7fafc 0%,#edf3f8 54%,#e3ebf2 100%);
+            color: var(--text);
+        }
+        .page-shell { max-width:860px; margin:0 auto; padding:28px 24px 60px; }
+
+        .topbar { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:22px; flex-wrap:wrap; }
+        .brand  { display:flex; align-items:center; gap:14px; }
+        .brand-mark { width:48px; height:48px; border-radius:14px; background:linear-gradient(135deg,var(--primary-dark),var(--primary)); color:#fff; display:grid; place-items:center; font-size:18px; font-weight:bold; box-shadow:0 10px 22px rgba(47,93,124,.22); }
+        .brand-kicker { color:var(--primary); font-size:12px; font-weight:bold; letter-spacing:.08em; text-transform:uppercase; }
+        .brand-title  { font-size:22px; font-weight:bold; letter-spacing:-.02em; }
+        .brand-sub    { color:var(--text-soft); font-size:13px; }
+        .back-link { text-decoration:none; background:rgba(255,255,255,.9); border:1px solid var(--border); border-radius:10px; padding:10px 14px; font-size:14px; font-weight:bold; color:var(--text); }
+
+        .progress-bar { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 22px; box-shadow:var(--shadow); margin-bottom:22px; }
+        .progress-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+        .progress-header h3 { font-size:16px; }
+        .progress-header p  { color:var(--text-soft); font-size:13px; }
+        .steps-track { display:flex; align-items:center; }
+        .step-item { display:flex; align-items:center; flex:1; }
+        .step-item:last-child { flex:0 0 auto; }
+        .step-dot { width:32px; height:32px; border-radius:999px; display:grid; place-items:center; font-size:13px; font-weight:bold; flex-shrink:0; border:2px solid var(--border); background:var(--surface-muted); color:var(--text-soft); }
+        .step-item.active .step-dot { background:var(--primary); border-color:var(--primary); color:#fff; }
+        .step-item.done   .step-dot { background:var(--success); border-color:var(--success); color:#fff; }
+        .step-connector { flex:1; height:2px; background:var(--border); margin:0 4px; }
+        .step-item.done + .step-item .step-connector,
+        .step-item.done .step-connector { background:var(--success); }
+
+        .form-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; position:relative; }
+        .form-card::before { content:""; position:absolute; inset:0 0 auto 0; height:4px; background:linear-gradient(90deg,var(--primary) 0%,#4b7fa3 55%,#8ab4cf 100%); }
+        .form-body { padding:28px; }
+
+        .section-kicker { color:var(--primary); font-size:12px; font-weight:bold; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
+        .form-body h3 { font-size:26px; letter-spacing:-.02em; margin-bottom:8px; }
+        .form-body > p { color:var(--text-soft); font-size:14px; line-height:1.7; margin-bottom:22px; }
+
+        .group-label { font-size:14px; font-weight:bold; color:var(--text); margin-bottom:12px; margin-top:4px; }
+        .group-note  { color:var(--text-soft); font-size:13px; font-weight:normal; }
+
+        .check-group { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:22px; }
+
+        .check-item { display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface-muted); cursor:pointer; transition:var(--transition); user-select:none; }
+        .check-item:hover { border-color:var(--primary); background:rgba(47,93,124,.04); }
+        .check-item input[type="checkbox"] { width:16px; height:16px; padding:0; margin-top:1px; flex-shrink:0; accent-color:var(--primary); cursor:pointer; }
+        .check-label { font-size:14px; line-height:1.5; color:var(--text); font-weight:normal; }
+        .check-sub   { font-size:12px; color:var(--text-soft); margin-top:2px; }
+
+        .divider { border:none; border-top:1px solid var(--border); margin:6px 0 22px; }
+
+        .field { display:grid; gap:8px; margin-bottom:18px; }
+        label { font-size:14px; font-weight:bold; color:var(--text); }
+        .label-req::after { content:" *"; color:var(--danger); }
+        select, textarea { width:100%; border:1px solid var(--border); background:#fff; color:var(--text); border-radius:12px; padding:12px 14px; font-size:14px; transition:var(--transition); font-family:Arial,sans-serif; }
+        select:focus, textarea:focus { outline:none; border-color:rgba(47,93,124,.7); box-shadow:0 0 0 4px rgba(47,93,124,.12); }
+        textarea { min-height:90px; resize:vertical; }
+        .field-note { color:var(--text-soft); font-size:12px; }
+
+        .relationship-field { display:none; }
+
+        .form-nav { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:22px 28px; border-top:1px solid var(--border); flex-wrap:wrap; }
+        .nav-note { color:var(--text-soft); font-size:13px; }
+        .btn { border:none; border-radius:12px; padding:12px 18px; font-size:14px; font-weight:bold; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:var(--transition); font-family:Arial,sans-serif; }
+        .btn:hover { transform:translateY(-1px); opacity:.95; }
+        .btn-primary { background:var(--primary); color:#fff; }
+        .btn-ghost   { background:rgba(255,255,255,.9); color:var(--text); border:1px solid var(--border); }
+
+        @media(max-width:640px){
+            .check-group { grid-template-columns:1fr; }
+            .form-body   { padding:20px; }
+            .form-nav    { padding:18px 20px; flex-direction:column; align-items:stretch; }
+            .btn         { justify-content:center; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-shell">
+
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">DM</div>
+            <div>
+                <div class="brand-kicker">Dispatch Montreal</div>
+                <div class="brand-title">Resident Registration</div>
+                <div class="brand-sub">Step 2 of 4</div>
+            </div>
+        </div>
+        <a class="back-link" href="personal-info.html">← Back</a>
+    </header>
+
+    <div class="progress-bar">
+        <div class="progress-header">
+            <h3>Step 2 of 4 — Health &amp; Needs</h3>
+            <p>Select all that apply</p>
+        </div>
+        <div class="steps-track">
+            <div class="step-item done"><div class="step-dot">✓</div></div>
+            <div class="step-connector"></div>
+            <div class="step-item active"><div class="step-dot">2</div></div>
+            <div class="step-connector"></div>
+            <div class="step-item"><div class="step-dot">3</div></div>
+            <div class="step-connector"></div>
+            <div class="step-item"><div class="step-dot">4</div></div>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <div class="form-body">
+            <div class="section-kicker">Step 2 of 4</div>
+            <h3>Health &amp; Special Needs</h3>
+            <p>
+                This information helps volunteers prepare appropriately and helps the system
+                prioritize residents who face the highest risk. Only the minimum necessary
+                detail is shared with assigned volunteers.
+            </p>
+
+            <!-- Health Conditions -->
+            <div class="group-label">Health Conditions <span class="group-note">(select all that apply)</span></div>
+            <div class="check-group">
+                <label class="check-item">
+                    <input type="checkbox" name="health" value="Type 2 diabetes" />
+                    <span><span class="check-label">Type 2 Diabetes</span><span class="check-sub">Insulin or medication may need refrigeration</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="health" value="Cardiovascular disease" />
+                    <span><span class="check-label">Cardiovascular Disease</span><span class="check-sub">Elevated sensitivity to temperature extremes</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="health" value="Respiratory illness" />
+                    <span><span class="check-label">Respiratory Illness</span><span class="check-sub">COPD, asthma, or other breathing conditions</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="health" value="Cognitive impairment" />
+                    <span><span class="check-label">Cognitive Impairment</span><span class="check-sub">Dementia, memory loss, or confusion</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="health" value="Mental health condition" />
+                    <span><span class="check-label">Mental Health Condition</span><span class="check-sub">Anxiety, depression, or similar</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="health" value="Other chronic illness" />
+                    <span><span class="check-label">Other Chronic Illness</span><span class="check-sub">Describe in the notes field below</span></span>
+                </label>
+            </div>
+
+            <hr class="divider" />
+
+            <!-- Mobility -->
+            <div class="group-label">Mobility &amp; Physical Limitations <span class="group-note">(select all that apply)</span></div>
+            <div class="check-group">
+                <label class="check-item">
+                    <input type="checkbox" name="mobility" value="Limited mobility" />
+                    <span><span class="check-label">Limited Mobility</span><span class="check-sub">Difficulty walking or moving independently</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="mobility" value="Uses a cane or walker" />
+                    <span><span class="check-label">Uses a Cane or Walker</span><span class="check-sub">Requires slow movement on stairs</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="mobility" value="Wheelchair user" />
+                    <span><span class="check-label">Wheelchair User</span><span class="check-sub">Elevator and ramp access required</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="mobility" value="Reduced hearing" />
+                    <span><span class="check-label">Reduced Hearing</span><span class="check-sub">Knock loudly or call ahead</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="mobility" value="Reduced vision" />
+                    <span><span class="check-label">Reduced Vision</span><span class="check-sub">May need verbal guidance during evacuation</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="mobility" value="Cannot use stairs" />
+                    <span><span class="check-label">Cannot Use Stairs</span><span class="check-sub">Elevator required for evacuation</span></span>
+                </label>
+            </div>
+
+            <hr class="divider" />
+
+            <!-- Electrical dependencies -->
+            <div class="group-label">Electrical Equipment Dependencies <span class="group-note">(select all that apply)</span></div>
+            <div class="check-group">
+                <label class="check-item">
+                    <input type="checkbox" name="equipment" value="Oxygen concentrator" />
+                    <span><span class="check-label">Oxygen Concentrator</span><span class="check-sub">Power outage is immediately life-threatening</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="equipment" value="Powered wheelchair" />
+                    <span><span class="check-label">Powered Wheelchair</span><span class="check-sub">Mobility depends on charging</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="equipment" value="Medication refrigeration" />
+                    <span><span class="check-label">Medication Refrigeration</span><span class="check-sub">Insulin, biologics, or similar</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="equipment" value="Home dialysis" />
+                    <span><span class="check-label">Home Dialysis Machine</span><span class="check-sub">Requires stable power supply</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="equipment" value="CPAP/BiPAP" />
+                    <span><span class="check-label">CPAP / BiPAP Device</span><span class="check-sub">Sleep apnea or breathing support</span></span>
+                </label>
+                <label class="check-item">
+                    <input type="checkbox" name="equipment" value="None" />
+                    <span><span class="check-label">No Electrical Dependencies</span><span class="check-sub">Does not depend on powered medical devices</span></span>
+                </label>
+            </div>
+
+            <hr class="divider" />
+
+            <div class="field">
+                <label for="additionalNeeds">Additional Health or Safety Notes</label>
+                <textarea id="additionalNeeds" placeholder="Describe any other conditions, allergies, or safety information volunteers should know."></textarea>
+                <span class="field-note">Only visible to the coordinator and assigned volunteer.</span>
+            </div>
+
+            <div class="field">
+                <label class="label-req" for="registrationType">Registration Type</label>
+                <select id="registrationType">
+                    <option value="">Select type</option>
+                    <option value="Self">Self (I am the resident)</option>
+                    <option value="Family caregiver">Family member / Caregiver</option>
+                    <option value="Organization">Partner organization staff</option>
+                </select>
+            </div>
+
+            <div class="field relationship-field" id="relationshipField">
+                <label for="relationship">Relationship to Resident</label>
+                <input id="relationship" type="text" placeholder="e.g. Daughter, Social worker" style="border:1px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px 14px;font-size:14px;width:100%;" />
+            </div>
+        </div>
+
+        <div class="form-nav">
+            <a class="btn btn-ghost" href="personal-info.html">← Back</a>
+            <button class="btn btn-primary" onclick="goNext()">Next: Emergency Contacts →</button>
+        </div>
+    </div>
+
+</div>
+<script>
+    document.getElementById("registrationType").addEventListener("change", function () {
+        const rel = document.getElementById("relationshipField");
+        rel.style.display = (this.value === "Family caregiver" || this.value === "Organization") ? "grid" : "none";
+    });
+
+    function goNext() {
+        const regType = document.getElementById("registrationType");
+        if (!regType.value) {
+            regType.style.borderColor = "var(--danger)";
+            return;
+        }
+        const data = {
+            health:           [...document.querySelectorAll('input[name="health"]:checked')].map(c => c.value),
+            mobility:         [...document.querySelectorAll('input[name="mobility"]:checked')].map(c => c.value),
+            equipment:        [...document.querySelectorAll('input[name="equipment"]:checked')].map(c => c.value),
+            additionalNeeds:  document.getElementById("additionalNeeds").value.trim(),
+            registrationType: regType.value,
+            relationship:     document.getElementById("relationship").value.trim(),
+        };
+        sessionStorage.setItem("reg_health", JSON.stringify(data));
+        window.location.href = "emergency-contacts.html";
+    }
+</script>
+</body>
+</html>

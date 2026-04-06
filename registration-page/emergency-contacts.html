@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dispatch Montreal - Emergency Contacts</title>
+    <style>
+        :root {
+            --bg:#eef2f6; --surface:#fff; --surface-muted:#f7f9fc;
+            --primary:#2f5d7c; --primary-dark:#23445b;
+            --danger:#b94a48; --danger-soft:#f6e2e1;
+            --success:#3f7d5c; --success-soft:#dceee3;
+            --text:#1f2933; --text-soft:#617182;
+            --border:#d7dee7; --shadow:0 8px 24px rgba(31,41,51,.08);
+            --radius:14px; --transition:.2s ease;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+        body{min-height:100vh;background:radial-gradient(circle at top left,rgba(47,93,124,.14),transparent 30%),linear-gradient(160deg,#f7fafc 0%,#edf3f8 54%,#e3ebf2 100%);color:var(--text);}
+        .page-shell{max-width:860px;margin:0 auto;padding:28px 24px 60px;}
+        .topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px;flex-wrap:wrap;}
+        .brand{display:flex;align-items:center;gap:14px;}
+        .brand-mark{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:#fff;display:grid;place-items:center;font-size:18px;font-weight:bold;box-shadow:0 10px 22px rgba(47,93,124,.22);}
+        .brand-kicker{color:var(--primary);font-size:12px;font-weight:bold;letter-spacing:.08em;text-transform:uppercase;}
+        .brand-title{font-size:22px;font-weight:bold;letter-spacing:-.02em;}
+        .brand-sub{color:var(--text-soft);font-size:13px;}
+        .back-link{text-decoration:none;background:rgba(255,255,255,.9);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:bold;color:var(--text);}
+        .progress-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;box-shadow:var(--shadow);margin-bottom:22px;}
+        .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+        .progress-header h3{font-size:16px;} .progress-header p{color:var(--text-soft);font-size:13px;}
+        .steps-track{display:flex;align-items:center;}
+        .step-item{display:flex;align-items:center;flex:1;} .step-item:last-child{flex:0 0 auto;}
+        .step-dot{width:32px;height:32px;border-radius:999px;display:grid;place-items:center;font-size:13px;font-weight:bold;flex-shrink:0;border:2px solid var(--border);background:var(--surface-muted);color:var(--text-soft);}
+        .step-item.active .step-dot{background:var(--primary);border-color:var(--primary);color:#fff;}
+        .step-item.done   .step-dot{background:var(--success);border-color:var(--success);color:#fff;}
+        .step-connector{flex:1;height:2px;background:var(--border);margin:0 4px;}
+        .form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;position:relative;}
+        .form-card::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,var(--primary) 0%,#4b7fa3 55%,#8ab4cf 100%);}
+        .form-body{padding:28px;}
+        .section-kicker{color:var(--primary);font-size:12px;font-weight:bold;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+        .form-body h3{font-size:26px;letter-spacing:-.02em;margin-bottom:8px;}
+        .form-body>p{color:var(--text-soft);font-size:14px;line-height:1.7;margin-bottom:22px;}
+        .info-box{background:var(--surface-muted);border:1px solid #e4ecf3;border-radius:12px;padding:14px 16px;margin-bottom:22px;font-size:13px;color:var(--text-soft);line-height:1.7;}
+        .info-box strong{color:var(--primary-dark);}
+        .sub-heading{font-size:18px;font-weight:bold;margin-bottom:14px;margin-top:4px;}
+        .optional-tag{color:var(--text-soft);font-weight:normal;font-size:14px;}
+        .input-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:6px;}
+        .field{display:grid;gap:8px;} .field-full{grid-column:1/-1;}
+        label{font-size:14px;font-weight:bold;color:var(--text);}
+        .label-req::after{content:" *";color:var(--danger);}
+        input,select,textarea{width:100%;border:1px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px 14px;font-size:14px;transition:var(--transition);font-family:Arial,sans-serif;}
+        input:focus,select:focus,textarea:focus{outline:none;border-color:rgba(47,93,124,.7);box-shadow:0 0 0 4px rgba(47,93,124,.12);}
+        input.invalid,select.invalid{border-color:var(--danger);box-shadow:0 0 0 3px rgba(185,74,72,.1);}
+        textarea{min-height:80px;resize:vertical;}
+        .divider{border:none;border-top:1px solid var(--border);margin:22px 0;}
+        .status-banner{display:none;border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:14px;line-height:1.6;}
+        .status-banner.show{display:block;} .status-banner.error{background:var(--danger-soft);border:1px solid #e5c3c1;color:var(--danger);}
+        .form-nav{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:22px 28px;border-top:1px solid var(--border);flex-wrap:wrap;}
+        .nav-note{color:var(--text-soft);font-size:13px;}
+        .btn{border:none;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:var(--transition);font-family:Arial,sans-serif;}
+        .btn:hover{transform:translateY(-1px);opacity:.95;}
+        .btn-primary{background:var(--primary);color:#fff;}
+        .btn-ghost{background:rgba(255,255,255,.9);color:var(--text);border:1px solid var(--border);}
+        @media(max-width:640px){.input-grid{grid-template-columns:1fr;}.form-body{padding:20px;}.form-nav{padding:18px 20px;flex-direction:column;align-items:stretch;}.btn{justify-content:center;}}
+    </style>
+</head>
+<body>
+<div class="page-shell">
+
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">DM</div>
+            <div>
+                <div class="brand-kicker">Dispatch Montreal</div>
+                <div class="brand-title">Resident Registration</div>
+                <div class="brand-sub">Step 3 of 4</div>
+            </div>
+        </div>
+        <a class="back-link" href="health-needs.html">← Back</a>
+    </header>
+
+    <div class="progress-bar">
+        <div class="progress-header">
+            <h3>Step 3 of 4 — Emergency Contacts</h3>
+            <p>At least one contact is required</p>
+        </div>
+        <div class="steps-track">
+            <div class="step-item done"><div class="step-dot">✓</div></div>
+            <div class="step-connector"></div>
+            <div class="step-item done"><div class="step-dot">✓</div></div>
+            <div class="step-connector"></div>
+            <div class="step-item active"><div class="step-dot">3</div></div>
+            <div class="step-connector"></div>
+            <div class="step-item"><div class="step-dot">4</div></div>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <div class="form-body">
+            <div class="section-kicker">Step 3 of 4</div>
+            <h3>Emergency Contacts</h3>
+            <p>
+                Provide at least one emergency contact who will be notified when a welfare
+                check is triggered. Contacts receive automated status updates via SMS or email
+                at three key points: trigger detected, volunteer dispatched, and check complete.
+            </p>
+
+            <div class="info-box">
+                <strong>When are contacts notified?</strong> (1) When an emergency trigger
+                is detected in the resident's area. (2) When a volunteer has been dispatched.
+                (3) When the welfare check outcome is recorded.
+            </div>
+
+            <div class="status-banner" id="statusBanner"></div>
+
+            <!-- Primary contact -->
+            <div class="sub-heading">Primary Emergency Contact</div>
+            <div class="input-grid">
+                <div class="field">
+                    <label class="label-req" for="ec1FirstName">First Name</label>
+                    <input id="ec1FirstName" type="text" placeholder="First name" />
+                </div>
+                <div class="field">
+                    <label class="label-req" for="ec1LastName">Last Name</label>
+                    <input id="ec1LastName" type="text" placeholder="Last name" />
+                </div>
+                <div class="field">
+                    <label class="label-req" for="ec1Relationship">Relationship</label>
+                    <input id="ec1Relationship" type="text" placeholder="e.g. Daughter, Neighbour" />
+                </div>
+                <div class="field">
+                    <label class="label-req" for="ec1Phone">Phone Number</label>
+                    <input id="ec1Phone" type="tel" placeholder="514-555-0100" />
+                </div>
+                <div class="field">
+                    <label for="ec1Email">Email Address</label>
+                    <input id="ec1Email" type="email" placeholder="contact@example.com" />
+                </div>
+                <div class="field">
+                    <label class="label-req" for="ec1NotifMethod">Notification Method</label>
+                    <select id="ec1NotifMethod">
+                        <option value="">Select method</option>
+                        <option>SMS Text Message</option>
+                        <option>Email</option>
+                        <option>Both SMS and Email</option>
+                    </select>
+                </div>
+                <div class="field field-full">
+                    <label for="ec1Notes">Notes for This Contact</label>
+                    <textarea id="ec1Notes" placeholder="Optional — e.g. only available weekdays, speaks French only"></textarea>
+                </div>
+            </div>
+
+            <hr class="divider" />
+
+            <!-- Secondary contact -->
+            <div class="sub-heading">Secondary Emergency Contact <span class="optional-tag">(Optional)</span></div>
+            <div class="input-grid">
+                <div class="field">
+                    <label for="ec2FirstName">First Name</label>
+                    <input id="ec2FirstName" type="text" placeholder="First name" />
+                </div>
+                <div class="field">
+                    <label for="ec2LastName">Last Name</label>
+                    <input id="ec2LastName" type="text" placeholder="Last name" />
+                </div>
+                <div class="field">
+                    <label for="ec2Relationship">Relationship</label>
+                    <input id="ec2Relationship" type="text" placeholder="e.g. Son, Doctor" />
+                </div>
+                <div class="field">
+                    <label for="ec2Phone">Phone Number</label>
+                    <input id="ec2Phone" type="tel" placeholder="514-555-0101" />
+                </div>
+                <div class="field">
+                    <label for="ec2Email">Email Address</label>
+                    <input id="ec2Email" type="email" placeholder="contact2@example.com" />
+                </div>
+                <div class="field">
+                    <label for="ec2NotifMethod">Notification Method</label>
+                    <select id="ec2NotifMethod">
+                        <option value="">Select method</option>
+                        <option>SMS Text Message</option>
+                        <option>Email</option>
+                        <option>Both SMS and Email</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-nav">
+            <a class="btn btn-ghost" href="health-needs.html">← Back</a>
+            <button class="btn btn-primary" onclick="goNext()">Next: Review &amp; Consent →</button>
+        </div>
+    </div>
+
+</div>
+<script>
+    function showError(msg) {
+        const b = document.getElementById("statusBanner");
+        b.className = "status-banner show error";
+        b.textContent = msg;
+    }
+
+    function goNext() {
+        const required = [
+            ["ec1FirstName",   "Contact 1 First Name"],
+            ["ec1LastName",    "Contact 1 Last Name"],
+            ["ec1Relationship","Contact 1 Relationship"],
+            ["ec1Phone",       "Contact 1 Phone"],
+            ["ec1NotifMethod", "Contact 1 Notification Method"],
+        ];
+        const missing = [];
+        required.forEach(([id, label]) => {
+            const el = document.getElementById(id);
+            if (!el.value.trim()) { el.classList.add("invalid"); missing.push(label); }
+            else el.classList.remove("invalid");
+        });
+        if (missing.length > 0) { showError("Please complete: " + missing.join(", ") + "."); return; }
+
+        const data = {
+            ec1FirstName:    document.getElementById("ec1FirstName").value.trim(),
+            ec1LastName:     document.getElementById("ec1LastName").value.trim(),
+            ec1Relationship: document.getElementById("ec1Relationship").value.trim(),
+            ec1Phone:        document.getElementById("ec1Phone").value.trim(),
+            ec1Email:        document.getElementById("ec1Email").value.trim(),
+            ec1NotifMethod:  document.getElementById("ec1NotifMethod").value,
+            ec1Notes:        document.getElementById("ec1Notes").value.trim(),
+            ec2FirstName:    document.getElementById("ec2FirstName").value.trim(),
+            ec2LastName:     document.getElementById("ec2LastName").value.trim(),
+            ec2Relationship: document.getElementById("ec2Relationship").value.trim(),
+            ec2Phone:        document.getElementById("ec2Phone").value.trim(),
+            ec2Email:        document.getElementById("ec2Email").value.trim(),
+            ec2NotifMethod:  document.getElementById("ec2NotifMethod").value,
+        };
+        sessionStorage.setItem("reg_contacts", JSON.stringify(data));
+        window.location.href = "review-consent.html";
+    }
+
+    document.querySelectorAll("input, select").forEach(el => {
+        el.addEventListener("input",  () => el.classList.remove("invalid"));
+        el.addEventListener("change", () => el.classList.remove("invalid"));
+    });
+</script>
+</body>
+</html>
