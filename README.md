@@ -49,7 +49,7 @@ This repository contains the front-end prototype for our SOEN 6841 project.
 
 ## Configuration Management
 We used GitHub for version control and configuration management.
-Each team member worked on a separate feature branch.
+Each team member worked on their indivisual feature branches.
 Completed work was merged into the stable main branch.
 
 ## Run the app 
