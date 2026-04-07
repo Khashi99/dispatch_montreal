@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dispatch Montreal - Resident Registration</title>
+    <style>
+        :root {
+            --bg: #eef2f6;
+            --surface: #ffffff;
+            --surface-muted: #f7f9fc;
+            --primary: #2f5d7c;
+            --primary-dark: #23445b;
+            --danger: #b94a48;
+            --danger-soft: #f6e2e1;
+            --success: #3f7d5c;
+            --success-soft: #dceee3;
+            --text: #1f2933;
+            --text-soft: #617182;
+            --border: #d7dee7;
+            --shadow: 0 8px 24px rgba(31, 41, 51, 0.08);
+            --radius: 14px;
+            --transition: 0.2s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(47, 93, 124, 0.14), transparent 30%),
+                linear-gradient(160deg, #f7fafc 0%, #edf3f8 54%, #e3ebf2 100%);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 1080px;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 22px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            padding: 32px;
+        }
+
+        .hero-card {
+            background: linear-gradient(160deg, #1f3347, #2f5d7c);
+            color: #fff;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .brand-mark {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.15);
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .brand-kicker {
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #a8c4d8;
+            margin-bottom: 4px;
+        }
+
+        .brand-title { font-size: 22px; font-weight: bold; }
+
+        .hero-card h1 {
+            font-size: 36px;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 14px;
+        }
+
+        .hero-card p {
+            color: #d9e4ee;
+            line-height: 1.7;
+            font-size: 15px;
+            margin-bottom: 28px;
+        }
+
+        .flow-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .flow-item {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .flow-item strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .flow-item span {
+            font-size: 13px;
+            color: #c5d8e8;
+            line-height: 1.5;
+        }
+
+        /* right card */
+        .login-card h2 {
+            font-size: 28px;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .login-card .sub {
+            color: var(--text-soft);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+        .secure-pill {
+            display: inline-block;
+            background: rgba(47,93,124,0.08);
+            border: 1px solid rgba(47,93,124,0.18);
+            color: var(--primary-dark);
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 22px;
+        }
+
+        .field { margin-bottom: 16px; }
+
+        .field label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        .field select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fff;
+            font-size: 14px;
+            color: var(--text);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .field select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(47,93,124,0.12);
+        }
+
+        .btn-stack { display: flex; flex-direction: column; gap: 10px; }
+
+        .btn {
+            display: block;
+            text-decoration: none;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .btn:hover { transform: translateY(-1px); opacity: 0.95; }
+
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-outline { background: #fff; color: var(--primary-dark); border: 1px solid var(--border); }
+
+        .note {
+            margin-top: 20px;
+            padding: 14px;
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 13px;
+            color: var(--text-soft);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 860px) {
+            .wrap { grid-template-columns: 1fr; }
+            .flow-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <!-- Hero / left card -->
+    <div class="card hero-card">
+        <div class="brand">
+            <div class="brand-mark">DM</div>
+            <div>
+                <div class="brand-kicker">Dispatch Montreal</div>
+                <div class="brand-title">Resident Portal</div>
+            </div>
+        </div>
+
+        <h1>Register for emergency welfare checks</h1>
+        <p>
+            Enroll yourself or a family member in the Dispatch Montreal vulnerability
+            registry. During power outages and extreme weather events, trained volunteers
+            will be dispatched to check on registered residents.
+        </p>
+
+        <div class="flow-grid">
+            <div class="flow-item">
+                <strong>1. Personal Info</strong>
+                <span>Name, address, contact details and floor level</span>
+            </div>
+            <div class="flow-item">
+                <strong>2. Health &amp; Needs</strong>
+                <span>Conditions, mobility, and electrical dependencies</span>
+            </div>
+            <div class="flow-item">
+                <strong>3. Emergency Contacts</strong>
+                <span>Who to notify when a welfare check is triggered</span>
+            </div>
+            <div class="flow-item">
+                <strong>4. Review &amp; Consent</strong>
+                <span>Confirm details and consent under Québec Law 25</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right / action card -->
+    <div class="card login-card">
+        <h2>Who is registering?</h2>
+        <p class="sub">
+            Select the registration type below and proceed to the form.
+            All personal data is protected under Québec Law 25.
+        </p>
+
+        <span class="secure-pill">Law 25 Compliant · Encrypted · Canada-hosted</span>
+
+        <div class="field">
+            <label for="regType">Registration Type</label>
+            <select id="regType">
+                <option value="self">Self — I am the resident</option>
+                <option value="caregiver">Family member / Caregiver</option>
+                <option value="organization">Partner organization staff</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="borough">Borough / Area</label>
+            <select id="borough">
+                <option value="">Select your area</option>
+                <option>Verdun</option>
+                <option>NDG</option>
+                <option>Rosemont</option>
+                <option>Plateau-Mont-Royal</option>
+                <option>Ville-Marie</option>
+                <option>Côte-des-Neiges</option>
+                <option>LaSalle</option>
+                <option>Saint-Laurent</option>
+                <option>Other</option>
+            </select>
+        </div>
+
+        <div class="btn-stack">
+            <a class="btn btn-primary" href="personal-info.html">Start Registration →</a>
+            <a class="btn btn-outline" href="../coordinator-dashboard/index.html">Coordinator Login</a>
+            <a class="btn btn-outline" href="../volunteer-page/Volunteer login screen.html">Volunteer Login</a>
+        </div>
+
+        <div class="note">
+            Already registered? Contact your community hub coordinator to update your information.
+            No login is required to register as a resident.
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

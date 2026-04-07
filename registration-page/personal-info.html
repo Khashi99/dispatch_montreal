@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dispatch Montreal - Personal Information</title>
+    <style>
+        :root {
+            --bg: #eef2f6;
+            --surface: #ffffff;
+            --surface-muted: #f7f9fc;
+            --primary: #2f5d7c;
+            --primary-dark: #23445b;
+            --danger: #b94a48;
+            --danger-soft: #f6e2e1;
+            --success: #3f7d5c;
+            --success-soft: #dceee3;
+            --text: #1f2933;
+            --text-soft: #617182;
+            --border: #d7dee7;
+            --shadow: 0 8px 24px rgba(31, 41, 51, 0.08);
+            --radius: 14px;
+            --transition: 0.2s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(47, 93, 124, 0.14), transparent 30%),
+                linear-gradient(160deg, #f7fafc 0%, #edf3f8 54%, #e3ebf2 100%);
+            color: var(--text);
+        }
+
+        .page-shell { max-width: 860px; margin: 0 auto; padding: 28px 24px 60px; }
+
+        /* topbar */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .brand { display: flex; align-items: center; gap: 14px; }
+
+        .brand-mark {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: #fff;
+            display: grid; place-items: center;
+            font-size: 18px; font-weight: bold;
+            box-shadow: 0 10px 22px rgba(47,93,124,0.22);
+        }
+
+        .brand-kicker { color: var(--primary); font-size: 12px; font-weight: bold; letter-spacing: 0.08em; text-transform: uppercase; }
+        .brand-title  { font-size: 22px; font-weight: bold; letter-spacing: -0.02em; }
+        .brand-sub    { color: var(--text-soft); font-size: 13px; }
+
+        .back-link {
+            text-decoration: none;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        /* progress */
+        .progress-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 22px;
+            box-shadow: var(--shadow);
+            margin-bottom: 22px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .progress-header h3 { font-size: 16px; }
+        .progress-header p  { color: var(--text-soft); font-size: 13px; }
+
+        .steps-track { display: flex; align-items: center; }
+
+        .step-item { display: flex; align-items: center; flex: 1; }
+        .step-item:last-child { flex: 0 0 auto; }
+
+        .step-dot {
+            width: 32px; height: 32px;
+            border-radius: 999px;
+            display: grid; place-items: center;
+            font-size: 13px; font-weight: bold;
+            flex-shrink: 0;
+            border: 2px solid var(--border);
+            background: var(--surface-muted);
+            color: var(--text-soft);
+        }
+
+        .step-item.active .step-dot { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .step-item.done   .step-dot { background: var(--success); border-color: var(--success); color: #fff; }
+
+        .step-connector { flex: 1; height: 2px; background: var(--border); margin: 0 4px; }
+
+        /* card */
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .form-card::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, #4b7fa3 55%, #8ab4cf 100%);
+        }
+
+        .form-body { padding: 28px; }
+
+        .section-kicker { color: var(--primary); font-size: 12px; font-weight: bold; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+
+        .form-body h3 { font-size: 26px; letter-spacing: -0.02em; margin-bottom: 8px; }
+
+        .form-body > p { color: var(--text-soft); font-size: 14px; line-height: 1.7; margin-bottom: 22px; }
+
+        .info-box {
+            background: var(--surface-muted);
+            border: 1px solid #e4ecf3;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--text-soft);
+            line-height: 1.7;
+        }
+
+        .info-box strong { color: var(--primary-dark); }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 16px;
+            margin-bottom: 6px;
+        }
+
+        .field { display: grid; gap: 8px; }
+        .field-full { grid-column: 1 / -1; }
+
+        label { font-size: 14px; font-weight: bold; color: var(--text); }
+        .label-req::after { content: " *"; color: var(--danger); }
+
+        input, select, textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text);
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 14px;
+            transition: var(--transition);
+            font-family: Arial, sans-serif;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: rgba(47,93,124,0.7);
+            box-shadow: 0 0 0 4px rgba(47,93,124,0.12);
+        }
+
+        input.invalid, select.invalid, textarea.invalid {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(185,74,72,0.1);
+        }
+
+        textarea { min-height: 90px; resize: vertical; }
+        .field-note { color: var(--text-soft); font-size: 12px; }
+
+        /* status */
+        .status-banner {
+            display: none;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .status-banner.show { display: block; }
+        .status-banner.error { background: var(--danger-soft); border: 1px solid #e5c3c1; color: var(--danger); }
+
+        /* nav */
+        .form-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 22px 28px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .nav-note { color: var(--text-soft); font-size: 13px; }
+
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            font-family: Arial, sans-serif;
+        }
+
+        .btn:hover { transform: translateY(-1px); opacity: 0.95; }
+
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-ghost   { background: rgba(255,255,255,0.9); color: var(--text); border: 1px solid var(--border); }
+
+        @media (max-width: 640px) {
+            .input-grid { grid-template-columns: 1fr; }
+            .form-body  { padding: 20px; }
+            .form-nav   { padding: 18px 20px; flex-direction: column; align-items: stretch; }
+            .btn        { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-shell">
+
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">DM</div>
+            <div>
+                <div class="brand-kicker">Dispatch Montreal</div>
+                <div class="brand-title">Resident Registration</div>
+                <div class="brand-sub">Step 1 of 4</div>
+            </div>
+        </div>
+        <a class="back-link" href="index.html">← Back to Start</a>
+    </header>
+
+    <!-- Progress -->
+    <div class="progress-bar">
+        <div class="progress-header">
+            <h3>Step 1 of 4 — Personal Information</h3>
+            <p>Complete all required fields to continue</p>
+        </div>
+        <div class="steps-track">
+            <div class="step-item active"><div class="step-dot">1</div></div>
+            <div class="step-connector"></div>
+            <div class="step-item"><div class="step-dot">2</div></div>
+            <div class="step-connector"></div>
+            <div class="step-item"><div class="step-dot">3</div></div>
+            <div class="step-connector"></div>
+            <div class="step-item"><div class="step-dot">4</div></div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-card">
+        <div class="form-body">
+            <div class="section-kicker">Step 1 of 4</div>
+            <h3>Personal Information</h3>
+            <p>
+                Provide the resident's contact details and home address. This is used to match
+                them with their nearest community hub and locate them during an emergency.
+                Fields marked <span style="color:var(--danger)">*</span> are required.
+            </p>
+
+            <div class="info-box">
+                <strong>Who should register?</strong> Seniors living alone, individuals with
+                disabilities or chronic illnesses, and people who depend on electricity for
+                medical devices. A family member or caregiver may complete this on their behalf.
+            </div>
+
+            <div class="status-banner" id="statusBanner"></div>
+
+            <div class="input-grid">
+                <div class="field">
+                    <label class="label-req" for="firstName">First Name</label>
+                    <input id="firstName" type="text" placeholder="First name" />
+                </div>
+
+                <div class="field">
+                    <label class="label-req" for="lastName">Last Name</label>
+                    <input id="lastName" type="text" placeholder="Last name" />
+                </div>
+
+                <div class="field">
+                    <label class="label-req" for="dob">Date of Birth</label>
+                    <input id="dob" type="date" />
+                </div>
+
+                <div class="field">
+                    <label for="age">Age</label>
+                    <input id="age" type="number" placeholder="Auto-calculated" readonly />
+                    <span class="field-note">Filled automatically from date of birth.</span>
+                </div>
+
+                <div class="field">
+                    <label class="label-req" for="phone">Phone Number</label>
+                    <input id="phone" type="tel" placeholder="514-555-0100" />
+                </div>
+
+                <div class="field">
+                    <label for="email">Email Address</label>
+                    <input id="email" type="email" placeholder="optional@example.com" />
+                    <span class="field-note">Optional — used for status notifications.</span>
+                </div>
+
+                <div class="field">
+                    <label class="label-req" for="preferredLang">Preferred Language</label>
+                    <select id="preferredLang">
+                        <option value="">Select language</option>
+                        <option>French</option>
+                        <option>English</option>
+                        <option>Bilingual</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label class="label-req" for="livingSituation">Living Situation</label>
+                    <select id="livingSituation">
+                        <option value="">Select situation</option>
+                        <option>Lives alone</option>
+                        <option>Lives with family</option>
+                        <option>Lives with roommate</option>
+                        <option>Assisted living facility</option>
+                    </select>
+                </div>
+
+                <div class="field field-full">
+                    <label class="label-req" for="streetAddress">Street Address</label>
+                    <input id="streetAddress" type="text" placeholder="123 Rue Wellington" />
+                </div>
+
+                <div class="field">
+                    <label for="apartment">Apartment / Unit</label>
+                    <input id="apartment" type="text" placeholder="Apt. 302" />
+                </div>
+
+                <div class="field">
+                    <label class="label-req" for="postalCode">Postal Code</label>
+                    <input id="postalCode" type="text" placeholder="H3E 1A1" maxlength="7" />
+                </div>
+
+                <div class="field">
+                    <label class="label-req" for="borough">Borough / Area</label>
+                    <select id="borough">
+                        <option value="">Select area</option>
+                        <option>Verdun</option>
+                        <option>NDG</option>
+                        <option>Rosemont</option>
+                        <option>Plateau-Mont-Royal</option>
+                        <option>Ville-Marie</option>
+                        <option>Côte-des-Neiges</option>
+                        <option>Mercier-Hochelaga</option>
+                        <option>Saint-Laurent</option>
+                        <option>LaSalle</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label class="label-req" for="buildingFloor">Floor Level</label>
+                    <select id="buildingFloor">
+                        <option value="">Select floor</option>
+                        <option>Ground floor</option>
+                        <option>1st floor</option>
+                        <option>2nd floor</option>
+                        <option>3rd floor</option>
+                        <option>4th floor or higher</option>
+                    </select>
+                    <span class="field-note">Used to assess evacuation difficulty.</span>
+                </div>
+
+                <div class="field field-full">
+                    <label for="accessNotes">Building Access Notes</label>
+                    <textarea id="accessNotes" placeholder="e.g. Buzz apartment 302. Rear entrance easier. Elevator available."></textarea>
+                    <span class="field-note">Help volunteers reach the resident quickly and safely.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-nav">
+            <p class="nav-note">All required fields must be completed before continuing.</p>
+            <button class="btn btn-primary" onclick="goNext()">Next: Health &amp; Needs →</button>
+        </div>
+    </div>
+
+</div>
+<script>
+    const dobInput = document.getElementById("dob");
+    const ageInput = document.getElementById("age");
+    dobInput.max = new Date().toISOString().split("T")[0];
+
+    dobInput.addEventListener("change", () => {
+        const birth = new Date(dobInput.value);
+        const today = new Date();
+        if (!dobInput.value || birth > today) { ageInput.value = ""; return; }
+        let age = today.getFullYear() - birth.getFullYear();
+        const m = today.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+        ageInput.value = age >= 0 ? age : "";
+    });
+
+    function showError(msg) {
+        const b = document.getElementById("statusBanner");
+        b.className = "status-banner show error";
+        b.textContent = msg;
+    }
+
+    function goNext() {
+        const required = [
+            ["firstName", "First Name"],
+            ["lastName", "Last Name"],
+            ["dob", "Date of Birth"],
+            ["phone", "Phone Number"],
+            ["preferredLang", "Preferred Language"],
+            ["livingSituation", "Living Situation"],
+            ["streetAddress", "Street Address"],
+            ["postalCode", "Postal Code"],
+            ["borough", "Borough / Area"],
+            ["buildingFloor", "Floor Level"],
+        ];
+
+        const missing = [];
+        required.forEach(([id, label]) => {
+            const el = document.getElementById(id);
+            if (!el.value.trim()) { el.classList.add("invalid"); missing.push(label); }
+            else el.classList.remove("invalid");
+        });
+
+        if (missing.length > 0) {
+            showError("Please complete the required fields: " + missing.join(", ") + ".");
+            return;
+        }
+
+        // Save to sessionStorage and navigate
+        const data = {};
+        required.forEach(([id]) => { data[id] = document.getElementById(id).value.trim(); });
+        data.age        = ageInput.value;
+        data.email      = document.getElementById("email").value.trim();
+        data.apartment  = document.getElementById("apartment").value.trim();
+        data.accessNotes= document.getElementById("accessNotes").value.trim();
+        sessionStorage.setItem("reg_personal", JSON.stringify(data));
+        window.location.href = "health-needs.html";
+    }
+
+    document.querySelectorAll("input, select, textarea").forEach(el => {
+        el.addEventListener("input",  () => el.classList.remove("invalid"));
+        el.addEventListener("change", () => el.classList.remove("invalid"));
+    });
+</script>
+</body>
+</html>
