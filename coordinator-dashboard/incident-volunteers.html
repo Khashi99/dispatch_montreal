@@ -66,25 +66,33 @@
       font-size: 14px;
     }
 
-    .nav {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+.nav {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-    .nav li {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 14px 12px;
-      border-radius: 10px;
-      cursor: default;
-      transition: var(--transition);
-    }
+.nav li {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 14px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: var(--transition);
+}
 
-    .nav li.active,
-    .nav li:hover {
-      background: var(--sidebar-hover);
-    }
+.nav li:hover,
+.nav li.active {
+  background: var(--sidebar-hover);
+}
+
+.nav li a {
+  display: block;
+  width: 100%;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+}
 
     .sidebar-footer {
       margin-top: auto;
@@ -159,6 +167,7 @@
     .summary-card .sub {
       color: var(--text-soft);
       font-size: 13px;
+      line-height: 1.5;
     }
 
     .status-banner {
@@ -235,6 +244,13 @@
       margin-bottom: 22px;
     }
 
+    .dual-panel-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
     .panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -252,22 +268,30 @@
       color: var(--text-soft);
       font-size: 14px;
       margin-bottom: 16px;
+      line-height: 1.6;
     }
 
-    .volunteer-list {
+    .volunteer-list,
+    .approval-list,
+    .mini-board,
+    .timeline-board {
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
 
-    .volunteer-card {
+    .volunteer-card,
+    .approval-card,
+    .mini-item,
+    .timeline-item {
       background: var(--surface-muted);
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 16px;
     }
 
-    .volunteer-top {
+    .volunteer-top,
+    .approval-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -275,18 +299,25 @@
       margin-bottom: 12px;
     }
 
-    .volunteer-top h4 {
+    .volunteer-top h4,
+    .approval-top h4,
+    .mini-item h4,
+    .timeline-item h4 {
       font-size: 18px;
       margin-bottom: 4px;
     }
 
-    .volunteer-meta {
+    .volunteer-meta,
+    .approval-meta,
+    .mini-item p,
+    .timeline-item p {
       color: var(--text-soft);
       font-size: 13px;
       line-height: 1.6;
     }
 
-    .volunteer-grid {
+    .volunteer-grid,
+    .approval-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px 16px;
@@ -295,7 +326,8 @@
       line-height: 1.6;
     }
 
-    .volunteer-actions {
+    .volunteer-actions,
+    .approval-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
@@ -320,14 +352,9 @@
       color: var(--primary-dark);
     }
 
-    .tag-busy {
+    .tag-pending {
       background: var(--warning-soft);
       color: var(--warning);
-    }
-
-    .tag-offline {
-      background: #eceff3;
-      color: #66788a;
     }
 
     .tag-high {
@@ -345,29 +372,38 @@
       color: var(--success);
     }
 
-    .mini-board {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    .tag-verified {
+      background: var(--success-soft);
+      color: var(--success);
     }
 
-    .mini-item {
-      background: var(--surface-muted);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
+    .tag-review {
+      background: var(--info-soft);
+      color: var(--primary-dark);
     }
 
-    .mini-item h4 {
-      font-size: 16px;
-      margin-bottom: 6px;
-    }
-
-    .mini-item p {
-      color: var(--text-soft);
+    .timeline-band {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
       font-size: 13px;
-      line-height: 1.6;
-      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .timeline-band.high {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .timeline-band.medium {
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .timeline-band.low {
+      background: var(--success-soft);
+      color: var(--success);
     }
 
     .table-panel {
@@ -422,7 +458,8 @@
         grid-template-columns: repeat(2, 1fr);
       }
 
-      .content-grid {
+      .content-grid,
+      .dual-panel-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -436,7 +473,9 @@
         width: 100%;
       }
 
-      .summary-grid {
+      .summary-grid,
+      .volunteer-grid,
+      .approval-grid {
         grid-template-columns: 1fr;
       }
 
@@ -444,39 +483,7 @@
         flex-direction: column;
         align-items: flex-start;
       }
-
-      .volunteer-grid {
-        grid-template-columns: 1fr;
-      }
     }
-     .nav {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .nav-item {
-    padding: 0;
-    border-radius: 10px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.08);
-    transition: 0.2s ease;
-  }
-
-  .nav-item:hover,
-  .nav-item.active {
-    background: #2b4863;
-  }
-
-  .nav-item a {
-    display: block;
-    width: 100%;
-    padding: 14px 12px;
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 14px;
-  }
   </style>
 </head>
 <body>
@@ -487,27 +494,22 @@
         <p>Coordinator Command Dashboard</p>
       </div>
 
-<ul class="nav">
-  <li class="nav-item"><a href="dashboard.html">Dashboard</a></li>
-  <li class="nav-item"><a href="emergency-events.html">Emergency Events</a></li>
-  <li class="nav-item"><a href="residents.html">Residents</a></li>
-  <li class="nav-item active"><a href="incident-volunteers.html">Volunteers</a></li>
-  <li class="nav-item"><a href="assignments.html">Assignments</a></li>
-  <li class="nav-item"><a href="assignment-reports.html">Reports</a></li>
-  <li class="nav-item"><a href="index.html">Logout</a></li>
-</ul>
-
-      <div class="sidebar-footer">
-        Prototype volunteer management page.<br>
-        Availability, skills, and incident statuses are demo content for presentation only.
-      </div>
+      <ul class="nav">
+        <li class="nav-item"><a href="dashboard.html">Dashboard</a></li>
+        <li class="nav-item"><a href="emergency-events.html">Emergency Events</a></li>
+        <li class="nav-item"><a href="residents.html">Residents</a></li>
+        <li class="nav-item active"><a href="incident-volunteers.html">Volunteers</a></li>
+        <li class="nav-item"><a href="assignments.html">Assignments</a></li>
+        <li class="nav-item"><a href="assignment-reports.html">Reports</a></li>
+        <li class="nav-item"><a href="index.html">Logout</a></li>
+      </ul>
     </aside>
 
     <main class="main">
       <header class="topbar">
         <div class="topbar-left">
           <h2>Incident Volunteers</h2>
-          <p>View volunteer availability, check assignment readiness, and match the right helper to each resident incident.</p>
+          <p>Review volunteer requests, monitor available and assigned responders, and track AI-based task distribution for resident incidents.</p>
         </div>
         <div class="topbar-right">
           Logged in: Community Hub Coordinator
@@ -516,44 +518,118 @@
 
       <section class="summary-grid">
         <div class="summary-card">
-          <div class="label">Total Volunteers</div>
-          <div class="value">8</div>
-          <div class="sub">Registered for emergency support</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Available Now</div>
-          <div class="value">4</div>
-          <div class="sub">Ready for immediate assignment</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Currently Assigned</div>
+          <div class="label">Volunteer Requests</div>
           <div class="value">3</div>
-          <div class="sub">Working on active incidents</div>
+          <div class="sub">Pending review before activation in the system</div>
         </div>
         <div class="summary-card">
-          <div class="label">Special Care Skills</div>
-          <div class="value">5</div>
-          <div class="sub">First aid, senior support, mobility help</div>
+          <div class="label">Available Volunteers</div>
+          <div class="value">4</div>
+          <div class="sub">Approved volunteers ready for AI dispatch</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Assigned Volunteers</div>
+          <div class="value">3</div>
+          <div class="sub">Currently covering multiple incidents</div>
         </div>
       </section>
 
       <section class="status-banner">
-        <h3>Volunteer Matching Overview</h3>
+        <h3>Volunteer Review and AI Dispatch Overview</h3>
         <p>
-          This page supports the coordinator after an incident is reviewed. It shows which volunteers are available,
-          what skills they have, where they are located, and whether they are the best fit for a high-priority resident case.
+          Volunteers are not activated immediately after registration. The coordinator first reviews their profile,
+          reliability, and suitability for elderly resident support. Once approved, volunteers move into the live pool,
+          and incident-task allocation is handled automatically by the AI decision layer based on priority, location,
+          workload balance, and required response timeline.
         </p>
         <div class="button-row">
-          <button class="btn btn-primary">Assign Best Match</button>
-          <button class="btn btn-secondary">Filter by Area</button>
-          <button class="btn btn-outline">Show Unassigned Volunteers</button>
+          <button class="btn btn-primary">Review Pending Requests</button>
+          <button class="btn btn-secondary">Filter by Coverage Area</button>
+        </div>
+      </section>
+
+      <section class="dual-panel-grid">
+        <div class="panel">
+          <h3>Volunteer Approval Requests</h3>
+
+          <div class="approval-list">
+            <div class="approval-card">
+              <div class="approval-top">
+                <div>
+                  <h4>Michael D.</h4>
+                  <div class="approval-meta">
+                    Request ID: V-REQ-102<br>
+                    Area: Verdun<br>
+                    Applied: Today, 08:05 AM
+                  </div>
+                </div>
+                <span class="tag tag-pending">Pending Review</span>
+              </div>
+              <div class="approval-grid">
+                <div><strong>Experience:</strong> Community volunteer, 2 years</div>
+                <div><strong>Availability:</strong> Weekdays, 7 AM - 5 PM</div>
+                <div><strong>Background Status:</strong> Identity documents submitted</div>
+                <div><strong>Reliability Note:</strong> Two local references added</div>
+              </div>
+              <div class="approval-actions">
+                <button class="btn btn-primary">View Profile</button>
+                <button class="btn btn-success">Approve Request</button>
+                <button class="btn btn-outline">Hold for Review</button>
+              </div>
+            </div>
+
+            <div class="approval-card">
+              <div class="approval-top">
+                <div>
+                  <h4>Sofia S.</h4>
+                  <div class="approval-meta">
+                    Request ID: V-REQ-103<br>
+                    Area: NDG<br>
+                    Applied: Today, 08:19 AM
+                  </div>
+                </div>
+                <span class="tag tag-review">Profile Check</span>
+              </div>
+              <div class="approval-grid">
+                <div><strong>Experience:</strong> Senior support and meal delivery</div>
+                <div><strong>Availability:</strong> Evenings and weekends</div>
+                <div><strong>Background Status:</strong> Verification in progress</div>
+                <div><strong>Reliability Note:</strong> Prior non-profit experience listed</div>
+              </div>
+              <div class="approval-actions">
+                <button class="btn btn-primary">View Profile</button>
+                <button class="btn btn-success">Approve Request</button>
+                <button class="btn btn-danger">Reject</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>AI Priority Timeline Rules</h3>
+          <div class="timeline-board">
+            <div class="timeline-item">
+              <h4>High Priority Incidents</h4>
+              <p>For urgent resident cases, the AI selects the best approved volunteer based on shortest travel time, capability match, and current workload limit.</p>
+              <span class="timeline-band high">Expected Arrival: 10–15 minutes</span>
+            </div>
+            <div class="timeline-item">
+              <h4>Medium Priority Incidents</h4>
+              <p>For follow-up and non-critical support, the system balances distance and queue load while keeping faster responders available for severe cases.</p>
+              <span class="timeline-band medium">Expected Arrival: 30–40 minutes</span>
+            </div>
+            <div class="timeline-item">
+              <h4>Low Priority Incidents</h4>
+              <p>Routine welfare checks are distributed after higher-priority demand is satisfied, while still respecting area coverage and volunteer availability.</p>
+              <span class="timeline-band low">Expected Arrival: 45–60 minutes</span>
+            </div>
+          </div>
         </div>
       </section>
 
       <section class="content-grid">
         <div class="panel">
           <h3>Volunteer Availability Cards</h3>
-          <p class="panel-subtitle">A presentation-ready list that makes it easy to explain how the coordinator chooses volunteers during an emergency.</p>
 
           <div class="volunteer-list">
             <div class="volunteer-card">
@@ -571,15 +647,15 @@
 
               <div class="volunteer-grid">
                 <div><strong>Skills:</strong> First Aid, Welfare Checks</div>
-                <div><strong>Distance:</strong> 0.8 km from incident zone</div>
-                <div><strong>Current Case:</strong> Marguerite, 78</div>
-                <div><strong>Priority Match:</strong> <span class="tag tag-high">High Priority</span></div>
-                <div><strong>Transport:</strong> Walking</div>
-                <div><strong>Status Note:</strong> En route to resident</div>
+                <div><strong>Distance Window:</strong> 0.8 km from current zone</div>
+                <div><strong>Active Incidents:</strong> 3 open tasks</div>
+                <div><strong>Priority Queue:</strong> 1 High, 1 Medium, 1 Low</div>
+                <div><strong>Current Route:</strong> Verdun cluster route</div>
+                <div><strong>Status Note:</strong> AI-dispatched based on fastest high-priority response</div>
               </div>
 
               <div class="volunteer-actions">
-                <button class="btn btn-primary">View Assignment</button>
+                <button class="btn btn-primary">View Task Queue</button>
                 <button class="btn btn-secondary">Contact</button>
               </div>
             </div>
@@ -599,16 +675,16 @@
 
               <div class="volunteer-grid">
                 <div><strong>Skills:</strong> Senior Support, Phone Check-ins</div>
-                <div><strong>Distance:</strong> 1.4 km from NDG cases</div>
-                <div><strong>Current Case:</strong> None</div>
-                <div><strong>Priority Match:</strong> <span class="tag tag-medium">Medium Priority</span></div>
+                <div><strong>Distance Window:</strong> 1.4 km from NDG cases</div>
+                <div><strong>Active Incidents:</strong> 0 open tasks</div>
+                <div><strong>Priority Queue:</strong> Ready for medium-priority allocation</div>
                 <div><strong>Transport:</strong> Car</div>
-                <div><strong>Status Note:</strong> Best choice for phone-first follow-up</div>
+                <div><strong>Status Note:</strong> Waiting for AI dispatch trigger</div>
               </div>
 
               <div class="volunteer-actions">
-                <button class="btn btn-primary">Assign to Case</button>
-                <button class="btn btn-outline">View Profile</button>
+                <button class="btn btn-primary">View Profile</button>
+                <button class="btn btn-outline">See Eligibility</button>
               </div>
             </div>
 
@@ -622,21 +698,21 @@
                     Last Check-in: 08:16 AM
                   </div>
                 </div>
-                <span class="tag tag-busy">Busy</span>
+                <span class="tag tag-assigned">Assigned</span>
               </div>
 
               <div class="volunteer-grid">
                 <div><strong>Skills:</strong> Home Visit, Mobility Support</div>
-                <div><strong>Distance:</strong> 2.1 km from current assignment</div>
-                <div><strong>Current Case:</strong> Amina, 74</div>
-                <div><strong>Priority Match:</strong> <span class="tag tag-low">Low Priority</span></div>
+                <div><strong>Distance Window:</strong> 2.1 km from current route</div>
+                <div><strong>Active Incidents:</strong> 2 open tasks</div>
+                <div><strong>Priority Queue:</strong> 1 Medium, 1 Low</div>
                 <div><strong>Transport:</strong> Bicycle</div>
-                <div><strong>Status Note:</strong> Submitted safe outcome recently</div>
+                <div><strong>Status Note:</strong> Carrying stacked incidents in same nearby zone</div>
               </div>
 
               <div class="volunteer-actions">
-                <button class="btn btn-success">View Result</button>
-                <button class="btn btn-outline">Stand by Next</button>
+                <button class="btn btn-primary">View Task Queue</button>
+                <button class="btn btn-secondary">Contact</button>
               </div>
             </div>
 
@@ -655,15 +731,15 @@
 
               <div class="volunteer-grid">
                 <div><strong>Skills:</strong> Emergency Escalation Support</div>
-                <div><strong>Distance:</strong> 3.2 km</div>
-                <div><strong>Current Case:</strong> Louise, 81</div>
-                <div><strong>Priority Match:</strong> <span class="tag tag-high">High Priority</span></div>
+                <div><strong>Distance Window:</strong> 3.2 km backup radius</div>
+                <div><strong>Active Incidents:</strong> 4 open tasks</div>
+                <div><strong>Priority Queue:</strong> 2 High, 1 Medium, 1 Low</div>
                 <div><strong>Transport:</strong> Car</div>
-                <div><strong>Status Note:</strong> On site with escalated resident</div>
+                <div><strong>Status Note:</strong> Highest-capacity responder under AI escalation routing</div>
               </div>
 
               <div class="volunteer-actions">
-                <button class="btn btn-danger">View Escalated Case</button>
+                <button class="btn btn-primary">View Task Queue</button>
                 <button class="btn btn-secondary">Contact</button>
               </div>
             </div>
@@ -672,31 +748,29 @@
 
         <div class="panel">
           <h3>Volunteer Insights</h3>
-          <p class="panel-subtitle">A smaller panel that helps explain how matching decisions are made in the mock-up.</p>
-
           <div class="mini-board">
             <div class="mini-item">
-              <h4>Closest Available Volunteer</h4>
-              <p>Sarah M. is the best available option for the next NDG case based on distance and phone check-in skills.</p>
-              <span class="tag tag-available">Ready</span>
+              <h4>Approval Gate Before Activation</h4>
+              <p>Every newly registered volunteer must pass coordinator review before entering the active dispatch pool for resident safety.</p>
+              <span class="tag tag-verified">Verified Entry Only</span>
             </div>
 
             <div class="mini-item">
-              <h4>High-Risk Case Support</h4>
-              <p>Two volunteers currently handling high-priority residents affected by the Verdun outage.</p>
-              <span class="tag tag-high">Urgent Coverage</span>
+              <h4>AI Dispatch Control</h4>
+              <p>LLM-based matching decides which approved volunteer gets which case by combining severity, proximity, skills, and current load.</p>
+              <span class="tag tag-review">Auto Allocation</span>
             </div>
 
             <div class="mini-item">
-              <h4>Need Reassignment Soon</h4>
-              <p>Omar H. may become available shortly after closing the Rosemont wellness check.</p>
-              <span class="tag tag-medium">Standby</span>
+              <h4>Multi-Incident Assignment</h4>
+              <p>One volunteer can be routed to several incidents when the tasks are geographically close and the priority queue allows stacking.</p>
+              <span class="tag tag-assigned">Queue Based</span>
             </div>
 
             <div class="mini-item">
-              <h4>Offline Volunteers</h4>
-              <p>1 registered volunteer has not confirmed availability this morning.</p>
-              <span class="tag tag-offline">Offline</span>
+              <h4>Priority SLA Monitoring</h4>
+              <p>High-priority cases are targeted within 10–15 minutes, while medium and low tasks are scheduled into longer response windows.</p>
+              <span class="tag tag-high">Time Sensitive</span>
             </div>
           </div>
         </div>
@@ -704,7 +778,6 @@
 
       <section class="table-panel">
         <h3>Volunteer Coordination Table</h3>
-        <p>More structured dashboard view showing how volunteers are distributed across incidents and areas.</p>
 
         <table>
           <thead>
@@ -712,8 +785,8 @@
               <th>Volunteer</th>
               <th>Area</th>
               <th>Skills</th>
-              <th>Current Assignment</th>
-              <th>Distance</th>
+              <th>Open Incidents</th>
+              <th>Priority Mix</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -722,49 +795,44 @@
               <td>David R.</td>
               <td>Verdun</td>
               <td>First Aid, Welfare Checks</td>
-              <td>Marguerite, 78</td>
-              <td>0.8 km</td>
+              <td>3</td>
+              <td>1 High / 1 Medium / 1 Low</td>
               <td><span class="tag tag-assigned">Assigned</span></td>
             </tr>
             <tr>
               <td>Sarah M.</td>
               <td>NDG</td>
               <td>Senior Support, Phone Check-ins</td>
-              <td>Unassigned</td>
-              <td>1.4 km</td>
+              <td>0</td>
+              <td>Ready for Medium Queue</td>
               <td><span class="tag tag-available">Available</span></td>
             </tr>
             <tr>
               <td>Omar H.</td>
               <td>Rosemont</td>
               <td>Mobility Support, Home Visits</td>
-              <td>Amina, 74</td>
-              <td>2.1 km</td>
-              <td><span class="tag tag-busy">Busy</span></td>
+              <td>2</td>
+              <td>1 Medium / 1 Low</td>
+              <td><span class="tag tag-assigned">Assigned</span></td>
             </tr>
             <tr>
               <td>Julie T.</td>
               <td>Plateau / Verdun</td>
               <td>Escalation Support</td>
-              <td>Louise, 81</td>
-              <td>3.2 km</td>
+              <td>4</td>
+              <td>2 High / 1 Medium / 1 Low</td>
               <td><span class="tag tag-assigned">Assigned</span></td>
             </tr>
             <tr>
               <td>Kevin L.</td>
               <td>LaSalle</td>
               <td>Driver, Supply Delivery</td>
-              <td>Unassigned</td>
-              <td>2.7 km</td>
+              <td>0</td>
+              <td>Ready for Low Queue</td>
               <td><span class="tag tag-available">Available</span></td>
             </tr>
           </tbody>
         </table>
-
-        <p class="foot-note">
-          This page fits naturally with your dashboard and assignments page: the coordinator can compare volunteers,
-          check who is free, and choose the best incident responder without needing any live backend integration.
-        </p>
       </section>
     </main>
   </div>
