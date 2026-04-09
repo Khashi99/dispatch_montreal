@@ -4,32 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dispatch Montreal - Coordinator Dashboard</title>
-    <!-- Add this inside <head>, above your <style> -->
-    <link
-            rel="stylesheet"
-            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
-            --bg: #eef2f6;
+            --bg: #edf2f7;
             --surface: #ffffff;
-            --surface-muted: #f7f9fc;
+            --surface-soft: #f7f9fc;
             --sidebar: #1f3347;
             --sidebar-hover: #2b4863;
             --primary: #2f5d7c;
             --primary-dark: #23445b;
-            --danger: #b94a48;
-            --danger-soft: #f6e2e1;
+            --danger: #c04a45;
+            --danger-soft: #f8e4e2;
             --warning: #b38728;
             --warning-soft: #f8eed3;
             --success: #3f7d5c;
             --success-soft: #dceee3;
+            --info: #4f6f8a;
+            --info-soft: #e8f0f7;
             --text: #1f2933;
             --text-soft: #617182;
-            --border: #d7dee7;
-            --shadow: 0 8px 24px rgba(31, 41, 51, 0.08);
-            --radius: 14px;
-            --transition: 0.2s ease;
+            --border: #d8e0e8;
+            --shadow: 0 10px 28px rgba(31, 41, 51, 0.08);
+            --radius: 16px;
+            --transition: 0.18s ease;
         }
 
         * {
@@ -57,6 +55,9 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
         }
 
         .brand h1 {
@@ -76,17 +77,25 @@
             gap: 10px;
         }
 
-        .nav li {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 14px 12px;
+        .nav-item {
             border-radius: 10px;
-            cursor: pointer;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.08);
             transition: var(--transition);
         }
 
-        .nav li:hover,
-        .nav li.active {
+        .nav-item:hover,
+        .nav-item.active {
             background: var(--sidebar-hover);
+        }
+
+        .nav-item a {
+            display: block;
+            width: 100%;
+            padding: 14px 12px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
         }
 
         .sidebar-footer {
@@ -101,88 +110,99 @@
 
         .main {
             flex: 1;
-            padding: 28px;
+            padding: 26px;
         }
 
         .topbar {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             gap: 16px;
-            margin-bottom: 22px;
+            margin-bottom: 18px;
         }
 
         .topbar-left h2 {
-            font-size: 38px;
+            font-size: 34px;
             margin-bottom: 6px;
         }
 
         .topbar-left p {
             color: var(--text-soft);
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .topbar-right {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 14px 18px;
+            padding: 12px 16px;
             box-shadow: var(--shadow);
             font-size: 14px;
             color: var(--text-soft);
+            min-width: 220px;
+            text-align: right;
         }
 
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 22px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
         }
 
         .summary-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 18px;
+            padding: 16px;
             box-shadow: var(--shadow);
         }
 
         .summary-card .label {
             color: var(--text-soft);
-            font-size: 13px;
-            margin-bottom: 10px;
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
         .summary-card .value {
-            font-size: 30px;
+            font-size: 28px;
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .summary-card .sub {
             color: var(--text-soft);
-            font-size: 13px;
+            font-size: 12px;
         }
 
-        .alert-panel {
-            background: var(--danger-soft);
-            border: 1px solid #e7c3c2;
-            border-left: 6px solid var(--danger);
+        .emergency-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 22px;
             box-shadow: var(--shadow);
+            padding: 18px;
+            margin-bottom: 18px;
         }
 
-        .alert-panel h3 {
-            color: var(--danger);
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-
-        .alert-panel p {
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
             margin-bottom: 14px;
-            line-height: 1.5;
+            flex-wrap: wrap;
+        }
+
+        .panel-head h3 {
+            font-size: 21px;
+        }
+
+        .panel-head p {
+            color: var(--text-soft);
+            font-size: 13px;
+            margin-top: 4px;
         }
 
         .button-row {
@@ -194,162 +214,79 @@
         .btn {
             border: none;
             border-radius: 10px;
-            padding: 11px 16px;
-            font-size: 14px;
+            padding: 10px 14px;
+            min-height: 40px;
+            font-size: 13px;
+            line-height: 1;
             cursor: pointer;
             transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
         }
 
         .btn:hover {
-            opacity: 0.92;
             transform: translateY(-1px);
+            opacity: 0.96;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: #fff;
-        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-secondary { background: #73808c; color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-outline { background: #fff; color: var(--primary-dark); border: 1px solid var(--border); }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-warning { background: var(--warning); color: #fff; }
 
-        .btn-secondary {
-            background: #73808c;
-            color: #fff;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: #fff;
-        }
-
-        .btn-outline {
-            background: #fff;
-            color: var(--primary-dark);
-            border: 1px solid var(--border);
-        }
-
-        .middle-grid {
+        .event-strip {
             display: grid;
             grid-template-columns: 1.15fr 0.85fr;
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .event-card,
+        .queue-card {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            background: var(--surface-soft);
+        }
+
+        .event-meta {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .metric-mini {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .metric-mini .mini-label {
+            color: var(--text-soft);
+            font-size: 11px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .metric-mini .mini-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
             gap: 18px;
-            margin-bottom: 22px;
+            margin-bottom: 18px;
         }
 
         .panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .panel h3 {
-            font-size: 22px;
-            margin-bottom: 8px;
-        }
-
-        .panel-subtitle {
-            color: var(--text-soft);
-            font-size: 14px;
-            margin-bottom: 16px;
-        }
-
-        .map-box {
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
-            min-height: 320px;
-            background: #dfe8f1;
-        }
-
-        #dashboardMap {
-            width: 100%;
-            height: 320px;
-        }
-
-        .volunteer-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .volunteer-card {
-            background: var(--surface-muted);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px;
-        }
-
-        .volunteer-top {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .volunteer-top h4 {
-            font-size: 16px;
-        }
-
-        .volunteer-meta {
-            color: var(--text-soft);
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .tag {
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .tag-available {
-            background: var(--success-soft);
-            color: var(--success);
-        }
-
-        .tag-busy {
-            background: var(--warning-soft);
-            color: var(--warning);
-        }
-
-        .tag-high {
-            background: var(--danger-soft);
-            color: var(--danger);
-        }
-
-        .tag-medium {
-            background: var(--warning-soft);
-            color: var(--warning);
-        }
-
-        .tag-low {
-            background: var(--success-soft);
-            color: var(--success);
-        }
-
-        .residents-section {
-            margin-bottom: 22px;
-        }
-
-        .section-title {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-
-        .section-subtitle {
-            color: var(--text-soft);
-            margin-bottom: 16px;
-            font-size: 14px;
-        }
-
-        .resident-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-        }
-
-        .resident-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
@@ -357,167 +294,280 @@
             box-shadow: var(--shadow);
         }
 
-        .resident-card h4 {
-            font-size: 20px;
+        .map-toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
             margin-bottom: 12px;
         }
 
-        .resident-details {
-            font-size: 15px;
-            line-height: 1.8;
-            margin-top: 12px;
-            margin-bottom: 14px;
-        }
-
-        .resident-details strong {
+        .chip {
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: #fff;
+            font-size: 12px;
+            cursor: pointer;
             color: var(--text);
         }
 
-        .resident-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 8px;
+        .chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
         }
 
-        .activity-section {
+        .map-box {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            min-height: 360px;
+            background: #dfe8f1;
+        }
+
+        #dashboardMap {
+            width: 100%;
+            height: 360px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-soft);
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .queue-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .queue-item {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            background: var(--surface-soft);
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .queue-left strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .queue-left span {
+            color: var(--text-soft);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .table-panel {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 20px;
+            padding: 18px;
             box-shadow: var(--shadow);
-        }
-
-        .activity-section h3 {
-            font-size: 30px;
-            margin-bottom: 14px;
+            margin-bottom: 18px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            overflow: hidden;
-            border-radius: 12px;
         }
 
         th,
         td {
             text-align: left;
-            padding: 14px 12px;
+            padding: 12px 10px;
             border-bottom: 1px solid #e7edf3;
-            font-size: 14px;
+            font-size: 13px;
+            vertical-align: middle;
         }
 
         th {
             background: #edf3f8;
             color: #34495c;
             font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .tag-high { background: var(--danger-soft); color: var(--danger); }
+        .tag-medium { background: var(--warning-soft); color: var(--warning); }
+        .tag-low { background: var(--success-soft); color: var(--success); }
+        .tag-available { background: var(--success-soft); color: var(--success); }
+        .tag-busy { background: var(--warning-soft); color: var(--warning); }
+        .tag-escalated { background: var(--danger-soft); color: var(--danger); }
+        .tag-info { background: var(--info-soft); color: var(--info); }
+
+        .action-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 8px 10px;
+            min-height: 34px;
+            font-size: 12px;
+        }
+
+        .remark {
+            color: var(--text-soft);
+            font-size: 12px;
+            line-height: 1.35;
         }
 
         .foot-note {
             color: var(--text-soft);
-            font-size: 13px;
-            margin-top: 14px;
+            font-size: 12px;
+            margin-top: 12px;
         }
 
-        .assign-box {
-            background: #f8fbfd;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 14px;
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 24, 39, 0.45);
             display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
         }
 
-        .assign-box label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: var(--text-soft);
-        }
-
-        .assign-box select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            background: #fff;
-        }
-
-        .assign-box .assign-actions {
+        .modal-backdrop.show {
             display: flex;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 760px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 18px 48px rgba(31, 41, 51, 0.22);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 18px 20px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .modal-header h4 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .modal-header p {
+            color: var(--text-soft);
+            font-size: 13px;
+        }
+
+        .modal-body {
+            padding: 16px 20px 20px;
+        }
+
+        .candidate-list {
+            display: grid;
             gap: 10px;
+            margin-top: 8px;
+        }
+
+        .candidate-card {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px;
+            background: var(--surface-soft);
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
             flex-wrap: wrap;
         }
 
-        @media (max-width: 1200px) {
-            .summary-grid,
-            .resident-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .middle-grid {
-                grid-template-columns: 1fr;
-            }
+        .candidate-main strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 14px;
         }
 
-        @media (max-width: 800px) {
-            .layout {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-            }
-
-            .summary-grid,
-            .resident-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .topbar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .zone {
-                position: static;
-                margin-bottom: 10px;
-            }
-
-            .route-line {
-                display: none;
-            }
+        .candidate-main span {
+            color: var(--text-soft);
+            font-size: 12px;
+            line-height: 1.4;
         }
-         .nav {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
 
-  .nav-item {
-    padding: 0;
-    border-radius: 10px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.08);
-    transition: 0.2s ease;
-  }
+        .candidate-rank {
+            min-width: 180px;
+            text-align: right;
+            color: var(--text-soft);
+            font-size: 12px;
+        }
 
-  .nav-item:hover,
-  .nav-item.active {
-    background: #2b4863;
-  }
+        .modal-footer {
+            padding: 0 20px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
 
-  .nav-item a {
-    display: block;
-    width: 100%;
-    padding: 14px 12px;
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 14px;
-  }
+        @media (max-width: 1280px) {
+            .summary-grid, .event-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .two-col, .event-strip { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 900px) {
+            .layout { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .topbar { flex-direction: column; }
+            .summary-grid { grid-template-columns: 1fr 1fr; }
+            .main { padding: 16px; }
+        }
+
+        @media (max-width: 640px) {
+            .summary-grid, .event-meta { grid-template-columns: 1fr; }
+            .topbar-left h2 { font-size: 28px; }
+            .action-group, .button-row, .map-toolbar { flex-direction: column; align-items: stretch; }
+            .btn, .btn-sm { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -528,19 +578,19 @@
             <p>Coordinator Command Dashboard</p>
         </div>
 
-<ul class="nav">
-  <li class="nav-item active"><a href="dashboard.html">Dashboard</a></li>
-  <li class="nav-item"><a href="emergency-events.html">Emergency Events</a></li>
-  <li class="nav-item"><a href="residents.html">Residents</a></li>
-  <li class="nav-item"><a href="incident-volunteers.html">Volunteers</a></li>
-  <li class="nav-item"><a href="assignments.html">Assignments</a></li>
-  <li class="nav-item"><a href="assignment-reports.html">Reports</a></li>
-  <li class="nav-item"><a href="index.html">Logout</a></li>
-</ul>
+        <ul class="nav">
+            <li class="nav-item active"><a href="dashboard.html">Dashboard</a></li>
+            <li class="nav-item"><a href="emergency-events.html">Emergency Events</a></li>
+            <li class="nav-item"><a href="residents.html">Residents</a></li>
+            <li class="nav-item"><a href="incident-volunteers.html">Volunteers</a></li>
+            <li class="nav-item"><a href="assignments.html">Assignments</a></li>
+            <li class="nav-item"><a href="assignment-reports.html">Reports</a></li>
+            <li class="nav-item"><a href="index.html">Logout</a></li>
+        </ul>
 
         <div class="sidebar-footer">
             Front-end prototype only.<br>
-            No real map, API, database, SMS, or GPS is connected.
+            Queue, assignment, escalation, and map behavior are simulated for presentation.
         </div>
     </aside>
 
@@ -548,348 +598,713 @@
         <header class="topbar">
             <div class="topbar-left">
                 <h2>Coordinator Dashboard</h2>
-                <p>Emergency coordination view for affected residents, nearby volunteers, and assignment tracking.</p>
+                <p>Auto-priority queue with coordinator review and reassignment.</p>
             </div>
             <div class="topbar-right">
-                Logged in: Community Hub Coordinator
+                Logged in: Verdun Community Hub<br>
+                Mode: Semi-automated dispatch
             </div>
         </header>
 
         <section class="summary-grid">
             <div class="summary-card">
-                <div class="label">Active Emergency</div>
-                <div class="value" id="summaryEmergency">0</div>
-                <div class="sub">No emergency triggered yet</div>
+                <div class="label">Active Emergencies</div>
+                <div class="value" id="summaryEmergency">2</div>
+                <div class="sub">1 high priority, 1 low priority</div>
             </div>
             <div class="summary-card">
                 <div class="label">Affected Residents</div>
-                <div class="value">3</div>
-                <div class="sub">Residents currently shown in impact zone</div>
+                <div class="value" id="summaryResidents">14</div>
+                <div class="sub">4 unchecked, 7 assigned, 3 monitored</div>
             </div>
             <div class="summary-card">
                 <div class="label">Available Volunteers</div>
-                <div class="value">3</div>
-                <div class="sub">1 volunteer currently busy</div>
+                <div class="value" id="summaryVolunteers">6</div>
+                <div class="sub">4 on task, 2 ready</div>
             </div>
             <div class="summary-card">
                 <div class="label">Escalated Cases</div>
-                <div class="value" id="summaryEscalated">0</div>
-                <div class="sub">Cases sent for emergency action</div>
+                <div class="value" id="summaryEscalated">2</div>
+                <div class="sub">1 by volunteer, 1 by coordinator</div>
             </div>
         </section>
 
-        <section class="alert-panel">
-            <h3>Active Emergency</h3>
-            <p id="eventText">No emergency triggered yet. Click a button below to simulate a front-end event for the mock-up demo.</p>
-            <div class="button-row">
-                <button class="btn btn-danger" onclick="triggerEvent('Winter Power Outage in Verdun')">Trigger Power Outage</button>
-                <button class="btn btn-primary" onclick="triggerEvent('Extreme Cold Alert in NDG')">Trigger Weather Alert</button>
-                <button class="btn btn-secondary" onclick="resetDashboard()">Reset Demo</button>
+        <section class="emergency-panel">
+            <div class="panel-head">
+                <div>
+                    <h3>Active Emergency Overview</h3>
+                    <p>Detected power outage and extreme cold alert. Backend ranks cases and updates the queue automatically.</p>
+                </div>
+                <div class="button-row">
+                    <button class="btn btn-success" onclick="autoAssignTop()">Refresh Queue</button>
+                    <button class="btn btn-outline" onclick="showEscalationsOnly()">Escalations Only</button>
+                    <button class="btn btn-secondary" onclick="resetDashboard()">Reset</button>
+                </div>
+            </div>
+
+            <div class="event-strip">
+                <div class="event-card">
+                    <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;">
+                        <div>
+                            <strong id="eventTitle">Detected Power Outage · Verdun</strong>
+                            <div class="remark" id="eventText">2 escalated cases, 3 unchecked residents, and 5 volunteers in or near the affected zone.</div>
+                        </div>
+                        <span class="tag tag-high" id="eventPriorityTag">High Priority Event</span>
+                    </div>
+                    <div class="event-meta">
+                        <div class="metric-mini"><div class="mini-label">Area</div><div class="mini-value" id="metaArea">Verdun</div></div>
+                        <div class="metric-mini"><div class="mini-label">Residents at Risk</div><div class="mini-value" id="metaResidents">10</div></div>
+                        <div class="metric-mini"><div class="mini-label">Volunteers in Zone</div><div class="mini-value" id="metaVolunteers">5</div></div>
+                        <div class="metric-mini"><div class="mini-label">Escalations</div><div class="mini-value" id="metaEscalations">2</div></div>
+                    </div>
+                </div>
+
+                <div class="queue-card">
+                    <strong>Dispatch Queue</strong>
+                    <div class="queue-list" id="queueList">
+                        <div class="queue-item">
+                            <div class="queue-left"><strong>#1 Marguerite</strong><span>High priority · 0.8 km volunteer match · mobility issue</span></div>
+                            <span class="tag tag-high">Immediate</span>
+                        </div>
+                        <div class="queue-item">
+                            <div class="queue-left"><strong>#2 Jean</strong><span>Medium priority · phone check fallback available</span></div>
+                            <span class="tag tag-medium">Queued</span>
+                        </div>
+                        <div class="queue-item">
+                            <div class="queue-left"><strong>#3 Amina</strong><span>Low priority · waiting for volunteer release</span></div>
+                            <span class="tag tag-low">Monitor</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section class="middle-grid">
+        <section class="two-col">
             <div class="panel">
-                <h3>Affected Area Overview</h3>
-                <p class="panel-subtitle">Simple mock-up zone view for the coordinator. This can later be replaced by a real map if needed.</p>
+                <div class="panel-head" style="margin-bottom:12px;">
+                    <div>
+                        <h3>Operations Map</h3>
+                        <p>Power outage zone, nearby residents, volunteer positions, and escalated cases.</p>
+                    </div>
+                    <div class="map-toolbar">
+                        <button class="chip active" id="chipEscalated" onclick="toggleLayer('escalated', this)">Escalated</button>
+                        <button class="chip active" id="chipVolunteers" onclick="toggleLayer('volunteers', this)">Volunteers</button>
+                        <button class="chip active" id="chipUnchecked" onclick="toggleLayer('unchecked', this)">Unchecked</button>
+                    </div>
+                </div>
 
                 <div class="map-box">
                     <div id="dashboardMap"></div>
                 </div>
+
+                <div class="legend">
+                    <span class="legend-item"><span class="legend-dot" style="background:#c04a45"></span> Escalated case</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#2f5d7c"></span> Volunteer on task</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#b38728"></span> Unchecked resident</span>
+                </div>
             </div>
 
             <div class="panel">
-                <h3>Available Volunteers</h3>
-                <p class="panel-subtitle">Nearby volunteers the coordinator can assign during the emergency.</p>
-
-                <div class="volunteer-list">
-                    <div class="volunteer-card">
-                        <div class="volunteer-top">
-                            <h4>David R.</h4>
-                            <span class="tag tag-available">Available</span>
-                        </div>
-                        <div class="volunteer-meta">
-                            Area: Verdun<br>
-                            Distance: 0.8 km<br>
-                            Skills: First Aid, Welfare Checks
-                        </div>
-                    </div>
-
-                    <div class="volunteer-card">
-                        <div class="volunteer-top">
-                            <h4>Sarah M.</h4>
-                            <span class="tag tag-available">Available</span>
-                        </div>
-                        <div class="volunteer-meta">
-                            Area: NDG<br>
-                            Distance: 1.4 km<br>
-                            Skills: Senior Support, Phone Check-ins
-                        </div>
-                    </div>
-
-                    <div class="volunteer-card">
-                        <div class="volunteer-top">
-                            <h4>Omar H.</h4>
-                            <span class="tag tag-available">Available</span>
-                        </div>
-                        <div class="volunteer-meta">
-                            Area: Rosemont<br>
-                            Distance: 2.1 km<br>
-                            Skills: Home Visit, Mobility Support
-                        </div>
-                    </div>
-
-                    <div class="volunteer-card">
-                        <div class="volunteer-top">
-                            <h4>Julie T.</h4>
-                            <span class="tag tag-busy">Busy</span>
-                        </div>
-                        <div class="volunteer-meta">
-                            Area: Plateau<br>
-                            Distance: 3.2 km<br>
-                            Status: Already assigned elsewhere
-                        </div>
+                <div class="panel-head" style="margin-bottom:10px;">
+                    <div>
+                        <h3>Queue Actions</h3>
+                        <p>Coordinator supervises generated assignments.</p>
                     </div>
                 </div>
+
+                <div class="queue-list">
+                    <div class="queue-item">
+                        <div class="queue-left">
+                            <strong>Generate queue</strong>
+                            <span>Rule-based ranking from event severity, resident risk, skills, distance, and language match.</span>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="flashMessage('Queue recalculated.')">Run</button>
+                    </div>
+                    <div class="queue-item">
+                        <div class="queue-left">
+                            <strong>Auto assignment</strong>
+                            <span>Suggest best volunteer and fill first available slots automatically.</span>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="autoAssignTop()">Apply</button>
+                    </div>
+                    <div class="queue-item">
+                        <div class="queue-left">
+                            <strong>Escalation review</strong>
+                            <span>Show only red-alert cases flagged by volunteers or coordinator.</span>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="showEscalationsOnly()">Open</button>
+                    </div>
+                </div>
+
+                <p class="foot-note" id="flashNote">Current mode: mixed queue with auto-assignment suggestions enabled.</p>
             </div>
         </section>
 
-        <section class="residents-section">
-            <h3 class="section-title">Prioritized Resident List</h3>
-            <p class="section-subtitle">The coordinator reviews affected residents, checks their urgency level, and assigns the most suitable volunteer.</p>
-
-            <div class="resident-grid">
-                <div class="resident-card">
-                    <h4>Marguerite, 78</h4>
-                    <span class="tag tag-high">High Priority</span>
-
-                    <div class="resident-details">
-                        <strong>Area:</strong> Verdun<br>
-                        <strong>Condition:</strong> Limited mobility, diabetes<br>
-                        <strong>Address:</strong> 214 Rue Wellington<br>
-                        <strong>Status:</strong> <span id="status1">Waiting</span>
-                    </div>
-
-                    <div class="resident-actions">
-                        <button class="btn btn-primary" onclick="toggleAssignBox('assignBox1')">Assign Volunteer</button>
-                        <button class="btn btn-danger" onclick="escalateCase('Marguerite, 78', 'status1', 'row1')">Escalate</button>
-                    </div>
-
-                    <div class="assign-box" id="assignBox1">
-                        <label>Select a volunteer for Marguerite</label>
-                        <select id="volunteerSelect1">
-                            <option value="">Choose volunteer</option>
-                            <option value="David R. - 0.8 km away">David R. - 0.8 km away</option>
-                            <option value="Sarah M. - 1.4 km away">Sarah M. - 1.4 km away</option>
-                            <option value="Omar H. - 2.1 km away">Omar H. - 2.1 km away</option>
-                        </select>
-                        <div class="assign-actions">
-                            <button class="btn btn-primary" onclick="confirmAssignment('Marguerite, 78', 'status1', 'row1', 'volunteerSelect1', 'assignBox1')">Confirm Assignment</button>
-                            <button class="btn btn-outline" onclick="toggleAssignBox('assignBox1')">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="resident-card">
-                    <h4>Jean, 69</h4>
-                    <span class="tag tag-medium">Medium Priority</span>
-
-                    <div class="resident-details">
-                        <strong>Area:</strong> NDG<br>
-                        <strong>Condition:</strong> Lives alone<br>
-                        <strong>Address:</strong> 88 Avenue Somerled<br>
-                        <strong>Status:</strong> <span id="status2">Waiting</span>
-                    </div>
-
-                    <div class="resident-actions">
-                        <button class="btn btn-primary" onclick="toggleAssignBox('assignBox2')">Assign Volunteer</button>
-                        <button class="btn btn-danger" onclick="escalateCase('Jean, 69', 'status2', 'row2')">Escalate</button>
-                    </div>
-
-                    <div class="assign-box" id="assignBox2">
-                        <label>Select a volunteer for Jean</label>
-                        <select id="volunteerSelect2">
-                            <option value="">Choose volunteer</option>
-                            <option value="Sarah M. - 1.4 km away">Sarah M. - 1.4 km away</option>
-                            <option value="David R. - 2.0 km away">David R. - 2.0 km away</option>
-                            <option value="Omar H. - 2.6 km away">Omar H. - 2.6 km away</option>
-                        </select>
-                        <div class="assign-actions">
-                            <button class="btn btn-primary" onclick="confirmAssignment('Jean, 69', 'status2', 'row2', 'volunteerSelect2', 'assignBox2')">Confirm Assignment</button>
-                            <button class="btn btn-outline" onclick="toggleAssignBox('assignBox2')">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="resident-card">
-                    <h4>Amina, 74</h4>
-                    <span class="tag tag-low">Low Priority</span>
-
-                    <div class="resident-details">
-                        <strong>Area:</strong> Rosemont<br>
-                        <strong>Condition:</strong> Needs check-in only<br>
-                        <strong>Address:</strong> 5030 Rue Beaubien<br>
-                        <strong>Status:</strong> <span id="status3">Waiting</span>
-                    </div>
-
-                    <div class="resident-actions">
-                        <button class="btn btn-primary" onclick="toggleAssignBox('assignBox3')">Assign Volunteer</button>
-                        <button class="btn btn-danger" onclick="escalateCase('Amina, 74', 'status3', 'row3')">Escalate</button>
-                    </div>
-
-                    <div class="assign-box" id="assignBox3">
-                        <label>Select a volunteer for Amina</label>
-                        <select id="volunteerSelect3">
-                            <option value="">Choose volunteer</option>
-                            <option value="Omar H. - 2.1 km away">Omar H. - 2.1 km away</option>
-                            <option value="Sarah M. - 2.8 km away">Sarah M. - 2.8 km away</option>
-                            <option value="David R. - 3.0 km away">David R. - 3.0 km away</option>
-                        </select>
-                        <div class="assign-actions">
-                            <button class="btn btn-primary" onclick="confirmAssignment('Amina, 74', 'status3', 'row3', 'volunteerSelect3', 'assignBox3')">Confirm Assignment</button>
-                            <button class="btn btn-outline" onclick="toggleAssignBox('assignBox3')">Cancel</button>
-                        </div>
-                    </div>
+        <section class="table-panel">
+            <div class="panel-head">
+                <div>
+                    <h3>Resident Priority Queue</h3>
+                    <p>Auto-ranked cases with recommended action and volunteer match.</p>
                 </div>
             </div>
-        </section>
 
-        <section class="activity-section">
-            <h3>Assignment Activity</h3>
             <table>
                 <thead>
                 <tr>
+                    <th>Queue</th>
                     <th>Resident</th>
-                    <th>Volunteer</th>
                     <th>Area</th>
-                    <th>Current State</th>
+                    <th>Priority</th>
+                    <th>Suggested Match</th>
+                    <th>Status</th>
+                    <th>Remark</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr id="row1">
+                <tbody id="residentTableBody">
+                <tr id="resident-r1">
+                    <td>#1</td>
                     <td>Marguerite, 78</td>
-                    <td>Not Assigned</td>
                     <td>Verdun</td>
-                    <td><span class="tag tag-medium">Waiting</span></td>
+                    <td><span class="tag tag-high">High</span></td>
+                    <td id="suggest-r1">David R. · 0.8 km · First Aid</td>
+                    <td id="status-r1"><span class="tag tag-info">Auto-assigned</span></td>
+                    <td id="remark-r1" class="remark">Assigned to David R. by system recommendation</td>
+                    <td>
+                        <div class="action-group">
+                            <button class="btn btn-outline btn-sm" onclick="reassignResident('r1')">Reassign</button>
+                            <button class="btn btn-danger btn-sm" onclick="escalateResident('r1','volunteer')">Escalate</button>
+                        </div>
+                    </td>
                 </tr>
-                <tr id="row2">
+                <tr id="resident-r2">
+                    <td>#2</td>
                     <td>Jean, 69</td>
-                    <td>Not Assigned</td>
                     <td>NDG</td>
-                    <td><span class="tag tag-medium">Waiting</span></td>
+                    <td><span class="tag tag-medium">Medium</span></td>
+                    <td id="suggest-r2">Sarah M. · Phone check · French</td>
+                    <td id="status-r2"><span class="tag tag-info">Auto-assigned</span></td>
+                    <td id="remark-r2" class="remark">Assigned to Sarah M. by system recommendation</td>
+                    <td>
+                        <div class="action-group">
+                            <button class="btn btn-outline btn-sm" onclick="reassignResident('r2')">Reassign</button>
+                            <button class="btn btn-danger btn-sm" onclick="escalateResident('r2','coordinator')">Escalate</button>
+                        </div>
+                    </td>
                 </tr>
-                <tr id="row3">
+                <tr id="resident-r3">
+                    <td>#3</td>
                     <td>Amina, 74</td>
-                    <td>Not Assigned</td>
                     <td>Rosemont</td>
-                    <td><span class="tag tag-medium">Waiting</span></td>
+                    <td><span class="tag tag-low">Low</span></td>
+                    <td id="suggest-r3">Omar H. · 2.1 km · Home visit</td>
+                    <td id="status-r3"><span class="tag tag-info">Queued</span></td>
+                    <td id="remark-r3" class="remark">Queued until nearest home-visit volunteer is free</td>
+                    <td>
+                        <div class="action-group">
+                            <button class="btn btn-outline btn-sm" onclick="reassignResident('r3')">Reassign</button>
+                            <button class="btn btn-danger btn-sm" onclick="escalateResident('r3','volunteer')">Escalate</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="resident-r4">
+                    <td>#4</td>
+                    <td>Louise, 82</td>
+                    <td>Verdun</td>
+                    <td><span class="tag tag-high">High</span></td>
+                    <td id="suggest-r4">Queue only · no free in-zone volunteer</td>
+                    <td id="status-r4"><span class="tag tag-escalated">Escalated</span></td>
+                    <td id="remark-r4" class="remark">Escalated by coordinator after no free in-zone volunteer</td>
+                    <td>
+                        <div class="action-group">
+                            <button class="btn btn-outline btn-sm" onclick="reassignResident('r4')">Reassign</button>
+                            <button class="btn btn-danger btn-sm" onclick="escalateResident('r4','coordinator')">Escalate</button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="table-panel">
+            <div class="panel-head">
+                <div>
+                    <h3>Volunteer Assignment Table</h3>
+                    <p>Shows live volunteer job flow and coordinator override options.</p>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Volunteer</th>
+                    <th>Status</th>
+                    <th>Current Task</th>
+                    <th>Next Task</th>
+                    <th>Queue Load</th>
+                    <th>Area</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="volunteerTableBody">
+                <tr id="vol-v1">
+                    <td>David R.</td>
+                    <td id="vol-status-v1"><span class="tag tag-busy">On Task</span></td>
+                    <td id="vol-current-v1">Marguerite</td>
+                    <td id="vol-next-v1">Louise</td>
+                    <td id="vol-load-v1">2</td>
+                    <td>Verdun</td>
+                    <td>
+                        <div class="action-group">
+                            <button class="btn btn-outline btn-sm" onclick="addVolunteerToQueue('v1')">Add to Queue</button>
+                            <button class="btn btn-secondary btn-sm" onclick="cancelVolunteerTask('v1')">Cancel Job</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="vol-v2">
+                    <td>Sarah M.</td>
+                    <td id="vol-status-v2"><span class="tag tag-busy">On Task</span></td>
+                    <td id="vol-current-v2">Jean</td>
+                    <td id="vol-next-v2">None</td>
+                    <td id="vol-load-v2">1</td>
+                    <td>NDG</td>
+                    <td>
+                        <div class="action-group">
+                            <button class="btn btn-outline btn-sm" onclick="addVolunteerToQueue('v2')">Add to Queue</button>
+                            <button class="btn btn-secondary btn-sm" onclick="cancelVolunteerTask('v2')">Cancel Job</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="vol-v3">
+                    <td>Omar H.</td>
+                    <td id="vol-status-v3"><span class="tag tag-available">Available</span></td>
+                    <td id="vol-current-v3">None</td>
+                    <td id="vol-next-v3">Amina</td>
+                    <td id="vol-load-v3">1</td>
+                    <td>Rosemont</td>
+                    <td>
+                        <div class="action-group">
+                            <button class="btn btn-outline btn-sm" onclick="addVolunteerToQueue('v3')">Add to Queue</button>
+                            <button class="btn btn-secondary btn-sm" onclick="cancelVolunteerTask('v3')">Cancel Job</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="vol-v4">
+                    <td>Julie T.</td>
+                    <td id="vol-status-v4"><span class="tag tag-busy">Backup</span></td>
+                    <td id="vol-current-v4">External support</td>
+                    <td id="vol-next-v4">None</td>
+                    <td id="vol-load-v4">1</td>
+                    <td>Plateau</td>
+                    <td>
+                        <div class="action-group">
+                            <button class="btn btn-outline btn-sm" onclick="addVolunteerToQueue('v4')">Add to Queue</button>
+                            <button class="btn btn-secondary btn-sm" onclick="cancelVolunteerTask('v4')">Cancel Job</button>
+                        </div>
+                    </td>
                 </tr>
                 </tbody>
             </table>
 
-            <p class="foot-note">
-                This front-end prototype is focused on coordinator actions such as viewing affected areas, checking resident priority, seeing available volunteers, assigning a responder, and escalating urgent cases.
-            </p>
+            <p class="foot-note">This table shows current job flow while the backend manages queue logic and recalculation.</p>
         </section>
     </main>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<div class="modal-backdrop" id="reassignModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-header">
+            <div>
+                <h4 id="modalTitle">Reassign volunteer</h4>
+                <p id="modalSubtitle">Available volunteers are sorted by current queue and distance.</p>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="closeReassignModal()">Close</button>
+        </div>
+        <div class="modal-body">
+            <div class="candidate-list" id="candidateList"></div>
+        </div>
+        <div class="modal-footer">
+            <div class="remark" id="modalHint">Lower queue and shorter distance appear first.</div>
+            <button class="btn btn-secondary btn-sm" onclick="closeReassignModal()">Done</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     let dashboardMap;
     let mapInitialized = false;
+    let layers = { escalated: [], volunteers: [], unchecked: [], circles: [] };
+    let visibleLayers = { escalated: true, volunteers: true, unchecked: true };
+
+    const scenarios = {
+        power: {
+            title: 'Detected Power Outage · Verdun',
+            desc: '2 escalated cases, 3 unchecked residents, and 5 volunteers in or near the affected zone.',
+            priority: 'High Priority Event',
+            area: 'Verdun',
+            residents: '10',
+            volunteers: '5',
+            escalations: '2',
+            summaryEmergency: '2',
+            summaryResidents: '14',
+            summaryVolunteers: '6',
+            summaryEscalated: '2'
+        },
+        cold: {
+            title: 'Detected Extreme Cold Alert · NDG',
+            desc: '1 escalated case, 2 unchecked residents, and 4 volunteers supporting phone-first checks.',
+            priority: 'Low Priority Event',
+            area: 'NDG',
+            residents: '8',
+            volunteers: '4',
+            escalations: '1',
+            summaryEmergency: '1',
+            summaryResidents: '11',
+            summaryVolunteers: '5',
+            summaryEscalated: '1'
+        }
+    };
+
+    const volunteerPool = {
+        'David R.': { id: 'v1', area: 'Verdun', skills: 'First Aid, Welfare Check', distance: { r1: 0.8, r2: 2.0, r3: 3.0, r4: 1.1 }, queue: 2, language: 'English / French' },
+        'Sarah M.': { id: 'v2', area: 'NDG', skills: 'Senior Support, Phone Check', distance: { r1: 1.4, r2: 0.7, r3: 2.8, r4: 2.2 }, queue: 1, language: 'French' },
+        'Omar H.': { id: 'v3', area: 'Rosemont', skills: 'Mobility Support, Home Visit', distance: { r1: 2.1, r2: 2.6, r3: 2.1, r4: 2.7 }, queue: 0, language: 'English / Arabic' },
+        'Julie T.': { id: 'v4', area: 'Plateau', skills: 'Phone Outreach', distance: { r1: 3.4, r2: 2.1, r3: 3.1, r4: 3.0 }, queue: 1, language: 'English / French' }
+    };
+
+    const residentNames = {
+        r1: 'Marguerite, 78',
+        r2: 'Jean, 69',
+        r3: 'Amina, 74',
+        r4: 'Louise, 82'
+    };
+
+    let currentReassignTarget = null;
 
     function initializeMap() {
         if (mapInitialized) return;
 
-        dashboardMap = L.map("dashboardMap").setView([45.5017, -73.5673], 11);
+        dashboardMap = L.map('dashboardMap', { zoomControl: true }).setView([45.5017, -73.5673], 11);
 
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: "&copy; OpenStreetMap contributors"
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '&copy; Esri & OpenStreetMap contributors',
+            maxZoom: 19,
+            crossOrigin: true
         }).addTo(dashboardMap);
 
-        L.marker([45.4592, -73.5725]).addTo(dashboardMap)
-            .bindPopup("<strong>Verdun</strong><br>1 high-priority case");
+        layers.escalated = [
+            L.marker([45.4592, -73.5725]).bindPopup('<strong>Escalated Case</strong><br>Marguerite · Verdun<br>Escalated by volunteer<br>Status: waiting for emergency response'),
+            L.marker([45.4881, -73.5843]).bindPopup('<strong>Escalated Case</strong><br>Louise · Verdun<br>Escalated by coordinator<br>Status: no free in-zone volunteer')
+        ];
 
-        L.marker([45.4765, -73.6500]).addTo(dashboardMap)
-            .bindPopup("<strong>NDG</strong><br>1 medium-priority case");
+        layers.volunteers = [
+            L.marker([45.4635, -73.5654]).bindPopup('<strong>Volunteer</strong><br>David R. · On task<br>Current: Marguerite<br>Skill: First Aid'),
+            L.marker([45.4765, -73.6500]).bindPopup('<strong>Volunteer</strong><br>Sarah M. · Phone check active<br>Current: Jean<br>Language: French'),
+            L.marker([45.5570, -73.5830]).bindPopup('<strong>Volunteer</strong><br>Omar H. · Nearby<br>Current: queued for Amina<br>Skill: Home visit')
+        ];
 
-        L.marker([45.5570, -73.5830]).addTo(dashboardMap)
-            .bindPopup("<strong>Rosemont</strong><br>1 low-priority case");
+        layers.unchecked = [
+            L.marker([45.4618, -73.5790]).bindPopup('<strong>Unchecked Resident</strong><br>Verdun<br>Status: queued for follow-up'),
+            L.marker([45.4748, -73.6482]).bindPopup('<strong>Unchecked Resident</strong><br>NDG<br>Status: pending phone check'),
+            L.marker([45.5532, -73.5904]).bindPopup('<strong>Unchecked Resident</strong><br>Rosemont<br>Status: waiting for volunteer release')
+        ];
+
+        layers.circles = [
+            L.circle([45.4728, -73.5765], { radius: 1800, color: '#c04a45', fillColor: '#c04a45', fillOpacity: 0.08, weight: 2 }).bindPopup('<strong>Power Outage Zone</strong><br>Verdun outage cluster<br>10 residents at risk · 5 volunteers nearby'),
+            L.circle([45.4592, -73.5725], { radius: 650, color: '#c04a45', fillColor: '#c04a45', fillOpacity: 0.12, weight: 2 }),
+            L.circle([45.4881, -73.5843], { radius: 500, color: '#c04a45', fillColor: '#c04a45', fillOpacity: 0.10, weight: 2 })
+        ];
+
+        layers.escalated.forEach(m => m.addTo(dashboardMap));
+        layers.volunteers.forEach(m => m.addTo(dashboardMap));
+        layers.unchecked.forEach(m => m.addTo(dashboardMap));
+        layers.circles.forEach(c => c.addTo(dashboardMap));
 
         mapInitialized = true;
-    }
-    function triggerEvent(message) {
-        document.getElementById("eventText").innerText =
-            "Emergency triggered: " + message + ". The coordinator can now review affected residents, check nearby volunteers, and assign support based on urgency.";
-        document.getElementById("summaryEmergency").innerText = "1";
+        setTimeout(() => dashboardMap.invalidateSize(), 100);
     }
 
-    function toggleAssignBox(boxId) {
-        const box = document.getElementById(boxId);
-        box.style.display = box.style.display === "block" ? "none" : "block";
+    function setLayerVisibility() {
+        const addOrRemove = (items, show) => {
+            items.forEach(item => {
+                if (show) {
+                    if (!dashboardMap.hasLayer(item)) item.addTo(dashboardMap);
+                } else {
+                    if (dashboardMap.hasLayer(item)) dashboardMap.removeLayer(item);
+                }
+            });
+        };
+
+        addOrRemove(layers.escalated, visibleLayers.escalated);
+        addOrRemove(layers.circles, visibleLayers.escalated);
+        addOrRemove(layers.volunteers, visibleLayers.volunteers);
+        addOrRemove(layers.unchecked, visibleLayers.unchecked);
     }
 
-    function confirmAssignment(residentName, statusId, rowId, selectId, boxId) {
-        const selectedVolunteer = document.getElementById(selectId).value;
+    function toggleLayer(type, button) {
+        visibleLayers[type] = !visibleLayers[type];
+        button.classList.toggle('active', visibleLayers[type]);
+        setLayerVisibility();
+        flashMessage(type.charAt(0).toUpperCase() + type.slice(1) + ' layer ' + (visibleLayers[type] ? 'shown.' : 'hidden.'));
+    }
 
-        if (!selectedVolunteer) {
-            alert("Please select a volunteer first.");
-            return;
+    function loadScenario(type) {
+        const s = scenarios[type];
+        document.getElementById('eventTitle').innerText = s.title;
+        document.getElementById('eventText').innerText = s.desc;
+        document.getElementById('eventPriorityTag').innerText = s.priority;
+        document.getElementById('eventPriorityTag').className = 'tag ' + (type === 'power' ? 'tag-high' : 'tag-low');
+        document.getElementById('metaArea').innerText = s.area;
+        document.getElementById('metaResidents').innerText = s.residents;
+        document.getElementById('metaVolunteers').innerText = s.volunteers;
+        document.getElementById('metaEscalations').innerText = s.escalations;
+        document.getElementById('summaryEmergency').innerText = s.summaryEmergency;
+        document.getElementById('summaryResidents').innerText = s.summaryResidents;
+        document.getElementById('summaryVolunteers').innerText = s.summaryVolunteers;
+        document.getElementById('summaryEscalated').innerText = s.summaryEscalated;
+
+        flashMessage(type === 'power' ? 'Detected power outage loaded.' : 'Detected extreme cold alert loaded.');
+    }
+
+    function flashMessage(message) {
+        document.getElementById('flashNote').innerText = message;
+    }
+
+    function assignResident(id, volunteer) {
+        document.getElementById('status-' + id).innerHTML = '<span class="tag tag-info">Assigned</span>';
+        document.getElementById('remark-' + id).innerText = 'Assigned to ' + volunteer + ' by coordinator review';
+        flashMessage(volunteer + ' assigned to queue item ' + id.toUpperCase() + '.');
+
+        if (volunteer === 'David R.') {
+            document.getElementById('vol-status-v1').innerHTML = '<span class="tag tag-busy">On Task</span>';
+            document.getElementById('vol-current-v1').innerText = 'Marguerite';
+            document.getElementById('vol-next-v1').innerText = 'Louise';
+            document.getElementById('vol-load-v1').innerText = '2';
+            document.getElementById('vol-next-v1').innerText = 'Louise';
+        }
+        if (volunteer === 'Sarah M.') {
+            document.getElementById('vol-status-v2').innerHTML = '<span class="tag tag-busy">On Task</span>';
+            document.getElementById('vol-current-v2').innerText = 'Jean';
+            document.getElementById('vol-next-v2').innerText = 'None';
+            document.getElementById('vol-load-v2').innerText = '1';
+            document.getElementById('vol-next-v2').innerText = 'None';
+        }
+        if (volunteer === 'Omar H.') {
+            document.getElementById('vol-status-v3').innerHTML = '<span class="tag tag-busy">On Task</span>';
+            document.getElementById('vol-current-v3').innerText = 'None';
+            document.getElementById('vol-next-v3').innerText = 'Amina';
+            document.getElementById('vol-load-v3').innerText = '1';
+            document.getElementById('vol-next-v3').innerText = 'None';
+        }
+        if (volunteer === 'Julie T.') {
+            document.getElementById('vol-status-v4').innerHTML = '<span class="tag tag-busy">On Task</span>';
+            document.getElementById('vol-current-v4').innerText = 'Louise';
+            document.getElementById('vol-next-v4').innerText = 'None';
+        }
+    }
+
+    function openReassignModal(targetId) {
+        currentReassignTarget = targetId;
+        const residentLabel = residentNames[targetId] || targetId.toUpperCase();
+        document.getElementById('modalTitle').innerText = 'Reassign for ' + residentLabel;
+        document.getElementById('modalSubtitle').innerText = 'Available volunteers sorted by shortest queue first, then distance.';
+
+        const currentSuggestion = (document.getElementById('suggest-' + targetId)?.innerText || '').split(' · ')[0].trim();
+        const candidates = Object.entries(volunteerPool)
+            .map(([name, info]) => ({
+                name,
+                info,
+                distance: info.distance[targetId] ?? 99,
+                queue: info.queue,
+                busyLabel: document.getElementById('vol-status-' + info.id)?.innerText.trim() || 'Available'
+            }))
+            .sort((a, b) => (a.queue - b.queue) || (a.distance - b.distance));
+
+        const list = document.getElementById('candidateList');
+        list.innerHTML = candidates.map(c => `
+      <div class="candidate-card">
+        <div class="candidate-main">
+          <strong>${c.name}${c.name === currentSuggestion ? ' · current match' : ''}</strong>
+          <span>${c.info.area} · ${c.info.skills}<br>${c.info.language} · ${c.distance.toFixed(1)} km away</span>
+        </div>
+        <div class="candidate-rank">
+          Queue: ${c.queue} task${c.queue === 1 ? '' : 's'}<br>${c.busyLabel}
+          <div style="margin-top:8px;">
+            <button class="btn btn-primary btn-sm" onclick="confirmReassign('${targetId}','${c.name}')">Select</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+        document.getElementById('reassignModal').classList.add('show');
+    }
+
+    function closeReassignModal() {
+        document.getElementById('reassignModal').classList.remove('show');
+        currentReassignTarget = null;
+    }
+
+    function confirmReassign(targetId, volunteerName) {
+        document.getElementById('suggest-' + targetId).innerText = volunteerName + ' · ' + volunteerPool[volunteerName].distance[targetId].toFixed(1) + ' km · ' + volunteerPool[volunteerName].skills.split(',')[0];
+        document.getElementById('status-' + targetId).innerHTML = '<span class="tag tag-medium">Reassigned</span>';
+        document.getElementById('remark-' + targetId).innerText = 'Reassigned to ' + volunteerName + ' after coordinator review. Queue recalculated automatically.';
+
+        const volunteer = volunteerPool[volunteerName];
+        volunteer.queue += 1;
+        document.getElementById('vol-status-' + volunteer.id).innerHTML = '<span class="tag tag-busy">On Task</span>';
+        const currentQueue = document.getElementById('vol-current-' + volunteer.id).innerText.trim();
+        const currentTaskCell = document.getElementById('vol-current-' + volunteer.id);
+        const nextTaskCell = document.getElementById('vol-next-' + volunteer.id);
+        const loadCell = document.getElementById('vol-load-' + volunteer.id);
+        const currentTask = currentTaskCell.innerText.trim();
+        const newName = residentNames[targetId].split(',')[0];
+        if (!currentTask || currentTask === 'None' || currentTask === 'No active task') {
+            currentTaskCell.innerText = newName;
+            nextTaskCell.innerText = 'None';
+        } else {
+            nextTaskCell.innerText = newName;
+        }
+        loadCell.innerText = String(volunteer.queue);
+
+        flashMessage(residentNames[targetId].split(',')[0] + ' reassigned to ' + volunteerName + '. Queue recalculated.');
+        closeReassignModal();
+    }
+
+    function reassignResident(id) {
+        openReassignModal(id);
+    }
+
+    function escalateResident(id, byWho) {
+        document.getElementById('status-' + id).innerHTML = '<span class="tag tag-escalated">Escalated</span>';
+        document.getElementById('remark-' + id).innerText = 'Escalated by ' + byWho + '.';
+        const current = parseInt(document.getElementById('summaryEscalated').innerText, 10) || 0;
+        document.getElementById('summaryEscalated').innerText = current + 1;
+        flashMessage('Case ' + id.toUpperCase() + ' escalated by ' + byWho + '.');
+    }
+
+    function reassignVolunteer(id) {
+        const preferredTarget = { v1: 'r4', v2: 'r2', v3: 'r3', v4: 'r1' };
+        openReassignModal(preferredTarget[id] || 'r3');
+        flashMessage('Select a new volunteer from the sorted list.');
+    }
+
+
+    function addVolunteerToQueue(id) {
+        const names = { v1: 'David R.', v2: 'Sarah M.', v3: 'Omar H.', v4: 'Julie T.' };
+        const currentTaskEl = document.getElementById('vol-current-' + id) || document.getElementById('vol-queue-' + id);
+        const nextTaskEl = document.getElementById('vol-next-' + id);
+        const loadEl = document.getElementById('vol-load-' + id);
+        const statusEl = document.getElementById('vol-status-' + id);
+
+        if (statusEl) {
+            statusEl.innerHTML = '<span class="tag tag-busy">On Task</span>';
         }
 
-        document.getElementById(statusId).innerText = "Assigned";
-        const row = document.getElementById(rowId);
-        row.cells[1].innerText = selectedVolunteer;
-        row.cells[3].innerHTML = '<span class="tag tag-low">Assigned</span>';
+        if (currentTaskEl && currentTaskEl.innerText.trim() === 'None') {
+            currentTaskEl.innerText = 'Waiting for next task';
+        }
 
-        document.getElementById(boxId).style.display = "none";
-        alert(selectedVolunteer + " assigned to " + residentName);
+        if (nextTaskEl) {
+            nextTaskEl.innerText = 'Queued follow-up';
+        }
+
+        if (loadEl) {
+            const current = parseInt(loadEl.innerText, 10) || 0;
+            loadEl.innerText = String(current + 1);
+        }
+
+        flashMessage(names[id] + ' added to active queue.');
     }
 
-    function escalateCase(residentName, statusId, rowId) {
-        document.getElementById(statusId).innerText = "Escalated to Emergency Services";
+    function cancelVolunteerTask(id) {
+        document.getElementById('vol-status-' + id).innerHTML = '<span class="tag tag-available">Available</span>';
+        document.getElementById('vol-current-' + id).innerText = 'None';
+        if (document.getElementById('vol-next-' + id)) document.getElementById('vol-next-' + id).innerText = 'None';
+        if (document.getElementById('vol-load-' + id)) document.getElementById('vol-load-' + id).innerText = '0';
+        flashMessage('Volunteer ' + id.toUpperCase() + ' task cancelled.');
+    }
 
-        const row = document.getElementById(rowId);
-        row.cells[1].innerText = "Coordinator Action";
-        row.cells[3].innerHTML = '<span class="tag tag-high">Escalated</span>';
+    function assignFromVolunteer(volunteerId, residentId) {
+        const map = { v3: 'Omar H.' };
+        assignResident(residentId, map[volunteerId]);
+    }
 
-        let escalatedCount = parseInt(document.getElementById("summaryEscalated").innerText, 10);
-        document.getElementById("summaryEscalated").innerText = escalatedCount + 1;
+    function autoAssignTop() {
+        assignResident('r1', 'David R.');
+        assignResident('r2', 'Sarah M.');
+        flashMessage('Top queue items auto-assigned using distance, skill, and language match.');
+    }
 
-        alert(residentName + " has been escalated to emergency services.");
+    function showEscalationsOnly() {
+        visibleLayers.escalated = true;
+        visibleLayers.volunteers = false;
+        visibleLayers.unchecked = false;
+        document.getElementById('chipEscalated').classList.add('active');
+        document.getElementById('chipVolunteers').classList.remove('active');
+        document.getElementById('chipUnchecked').classList.remove('active');
+        setLayerVisibility();
+        flashMessage('Map filtered to escalations only.');
     }
 
     function resetDashboard() {
-        document.getElementById("eventText").innerText =
-            "No emergency triggered yet. Click a button below to simulate a front-end event for the mock-up demo.";
-        document.getElementById("summaryEmergency").innerText = "0";
-        document.getElementById("summaryEscalated").innerText = "0";
+        volunteerPool['David R.'].queue = 2;
+        volunteerPool['Sarah M.'].queue = 1;
+        volunteerPool['Omar H.'].queue = 0;
+        volunteerPool['Julie T.'].queue = 1;
+        loadScenario('power');
+        document.getElementById('summaryEscalated').innerText = '2';
 
-        document.getElementById("status1").innerText = "Waiting";
-        document.getElementById("status2").innerText = "Waiting";
-        document.getElementById("status3").innerText = "Waiting";
+        document.getElementById('status-r1').innerHTML = '<span class="tag tag-info">Auto-assigned</span>';
+        document.getElementById('status-r2').innerHTML = '<span class="tag tag-info">Auto-assigned</span>';
+        document.getElementById('status-r3').innerHTML = '<span class="tag tag-info">Queued</span>';
+        document.getElementById('status-r4').innerHTML = '<span class="tag tag-escalated">Escalated</span>';
 
-        document.getElementById("row1").cells[1].innerText = "Not Assigned";
-        document.getElementById("row1").cells[3].innerHTML = '<span class="tag tag-medium">Waiting</span>';
+        document.getElementById('remark-r1').innerText = 'Assigned to David R. by system recommendation';
+        document.getElementById('remark-r2').innerText = 'Assigned to Sarah M. by system recommendation';
+        document.getElementById('remark-r3').innerText = 'Queued until nearest home-visit volunteer is free';
+        document.getElementById('remark-r4').innerText = 'Escalated by coordinator after no free in-zone volunteer';
 
-        document.getElementById("row2").cells[1].innerText = "Not Assigned";
-        document.getElementById("row2").cells[3].innerHTML = '<span class="tag tag-medium">Waiting</span>';
+        document.getElementById('vol-status-v1').innerHTML = '<span class="tag tag-busy">On Task</span>';
+        document.getElementById('vol-current-v1').innerText = 'Marguerite';
+        document.getElementById('vol-next-v1').innerText = 'Louise';
+        document.getElementById('vol-load-v1').innerText = '2';
+        document.getElementById('vol-next-v1').innerText = 'Auto-assigned by queue';
 
-        document.getElementById("row3").cells[1].innerText = "Not Assigned";
-        document.getElementById("row3").cells[3].innerHTML = '<span class="tag tag-medium">Waiting</span>';
+        document.getElementById('vol-status-v2').innerHTML = '<span class="tag tag-busy">On Task</span>';
+        document.getElementById('vol-current-v2').innerText = 'Jean';
+        document.getElementById('vol-next-v2').innerText = 'None';
+        document.getElementById('vol-load-v2').innerText = '1';
+        document.getElementById('vol-next-v2').innerText = 'Matched by language';
 
-        document.getElementById("assignBox1").style.display = "none";
-        document.getElementById("assignBox2").style.display = "none";
-        document.getElementById("assignBox3").style.display = "none";
+        document.getElementById('vol-status-v3').innerHTML = '<span class="tag tag-available">Available</span>';
+        document.getElementById('vol-current-v3').innerText = 'None';
+        document.getElementById('vol-next-v3').innerText = 'Amina';
+        document.getElementById('vol-load-v3').innerText = '1';
+        document.getElementById('vol-next-v3').innerText = 'Suggested next assignment';
 
-        document.getElementById("volunteerSelect1").selectedIndex = 0;
-        document.getElementById("volunteerSelect2").selectedIndex = 0;
-        document.getElementById("volunteerSelect3").selectedIndex = 0;
+        document.getElementById('vol-status-v4').innerHTML = '<span class="tag tag-busy">Busy</span>';
+        document.getElementById('vol-current-v4').innerText = 'External support';
+        document.getElementById('vol-next-v4').innerText = 'None';
+        document.getElementById('vol-load-v4').innerText = '1';
+        document.getElementById('vol-next-v4').innerText = 'Can be pulled for escalation';
+
+        visibleLayers = { escalated: true, volunteers: true, unchecked: true };
+        document.getElementById('chipEscalated').classList.add('active');
+        document.getElementById('chipVolunteers').classList.add('active');
+        document.getElementById('chipUnchecked').classList.add('active');
+        setLayerVisibility();
+        flashMessage('Dashboard reset to default presentation state.');
     }
-    window.addEventListener("load", () => {
+
+    document.getElementById('reassignModal').addEventListener('click', (e) => {
+        if (e.target.id === 'reassignModal') closeReassignModal();
+    });
+
+    window.addEventListener('load', () => {
         initializeMap();
+        loadScenario('power');
     });
 </script>
 </body>
